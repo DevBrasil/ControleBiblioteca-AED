@@ -68,7 +68,7 @@ Cabecalho_Codigo *le_cabecalho_codigos(FILE *arq)
     return cab;
 }
 
-void adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
+int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
 {
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     cab = le_cabecalho_codigos(arq);
@@ -173,10 +173,11 @@ void adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
     else
     {
         printf("Codigo ja existente");
+        return 0;
     }
 }
 
-void insere(FILE *arq, Codigo info)
+int insere(FILE *arq, Codigo info)
 {
     Cabecalho_Codigo *cab = le_cabecalho_codigos(arq);
     No_Codigo x;
@@ -192,10 +193,93 @@ void insere(FILE *arq, Codigo info)
         cab->pos_raiz = 0;
         cab->pos_topo++;
         escreve_cabecalho_codigo(arq, cab);
+        return 1;
     }
     else
     {
-        adiciona_codigo_no_bd_codigos(arq, info, cab->pos_raiz);
+        return adiciona_codigo_no_bd_codigos(arq, info, cab->pos_raiz);
+    }
+    return 0;
+}
+int maximo_codigo(FILE *arq, int pos)
+{
+    No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+    no_aux = le_no_codigo(arq, pos);
+
+    printf("codigo %d  direita = %d  esquerda = %d\n", no_aux->info, no_aux->direita, no_aux->esquerda);
+
+    if (no_aux->direita != -1)
+    {
+        maximo_codigo(arq, no_aux->direita);
+    }
+    else
+        return no_aux->info;
+}
+void deleta_o_codigo_na_arvore(FILE *arq, Codigo info, int pos)
+{
+
+    fseek(arq, sizeof(Cabecalho_Codigo) + pos * sizeof(No_Codigo), SEEK_SET);
+    No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+    fread(no_aux, sizeof(No_Codigo), 1, arq);
+
+    if (info < no_aux->info)
+    {
+        deleta_o_codigo_na_arvore(arq, info, no_aux->esquerda);
+    }
+    else if (info > no_aux->info)
+    {
+        deleta_o_codigo_na_arvore(arq, info, no_aux->direita);
+    }
+    else
+    { //encontrado
+
+        if (no_aux->esquerda == -1 && no_aux->direita == -1)
+        { //folha
+            printf("\ncaralho folha \n %d %d %d \n\n", no_aux->info, no_aux->esquerda, no_aux->direita);
+            No_Codigo *pai = (No_Codigo *)malloc(sizeof(No_Codigo));
+            pai = le_no_codigo(arq, no_aux->pai);
+            if (no_aux->info < pai->info)
+            { //filho esquerda
+                pai->esquerda = -1;
+                printf("\n1 filho = %d , pai = %d direita = %d esquerda = %d \n",no_aux->info,pai->info,pai->direita,pai->esquerda);
+            }
+            else
+            { //filho a direita
+                pai->direita = -1;
+                printf("\n2 filho = %d ,pai = %d direita = %d esquerda = %d \n",no_aux->info,pai->info,pai->direita,pai->esquerda);
+
+            }
+            escreve_no_codigo(arq, pai, no_aux->pai);
+            Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+            cab = le_cabecalho_codigos(arq);
+            escreve_no_codigo(arq, pai, no_aux->pai);
+            no_aux->direita = -1;
+            no_aux->esquerda = -1;
+            no_aux->pai = -1;
+            no_aux->info = cab->pos_livre;
+            cab->pos_livre = pos;
+            escreve_no_codigo(arq, no_aux, cab->pos_livre);
+            escreve_cabecalho_codigo(arq, cab);
+        }
+        else if (no_aux->esquerda == -1)
+        { //so tem filho para direita
+            printf("caralho da direita \n");
+            No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+            aux = le_no_codigo(arq, no_aux->direita);
+            no_aux->info = aux->info;
+            escreve_no_codigo(arq, no_aux, pos);
+            deleta_o_codigo_na_arvore(arq, no_aux->info, no_aux->direita);
+        }
+        else
+        { //tem 2 filhos ou só da esquerda
+            printf("\ntem dois filhos\n");
+
+            No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+            aux = le_no_codigo(arq, no_aux->esquerda);
+            no_aux->info = maximo_codigo(arq, no_aux->esquerda);
+            escreve_no_codigo(arq, no_aux, pos);
+            deleta_o_codigo_na_arvore(arq, no_aux->info, no_aux->esquerda);
+        }
     }
 }
 
@@ -217,22 +301,33 @@ void imprimir_arvore_binaria_na_notacao(FILE *arq, int pos)
     fseek(arq, sizeof(Cabecalho_Codigo) + pos * sizeof(No_Codigo), SEEK_SET);
     No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
     fread(no_aux, sizeof(No_Codigo), 1, arq);
+
     printf("[");
-    printf("%d,", no_aux->info);
-    if(no_aux->esquerda!=-1){
-        imprimir_arvore_binaria_na_notacao(arq, no_aux->esquerda);
-        printf(",");
-    }else{
-        printf("[],");
+    if (no_aux->info != -1)
+    {
+        printf("%d,", no_aux->info);
+
+        if (no_aux->esquerda != -1)
+        {
+            imprimir_arvore_binaria_na_notacao(arq, no_aux->esquerda);
+            printf(",");
+        }
+        else
+        {
+            printf("[],");
+        }
+
+        if (no_aux->direita != -1)
+        {
+            imprimir_arvore_binaria_na_notacao(arq, no_aux->direita);
+            // printf("");
+        }
+        else
+        {
+            printf("[]");
+        }
     }
-    
-    if(no_aux->direita!=-1){
-        imprimir_arvore_binaria_na_notacao(arq, no_aux->direita);
-      // printf("");
-    }else{
-        printf("[]");
-    }
-      printf("]");
+    printf("]");
 }
 
 int main()
@@ -255,24 +350,24 @@ int main()
 
     FILE *teste2;
     teste2 = fopen("bdcodigos.bin", "rb+");
-    scanf("%d", &info);
-    insere(teste2, info);
-    scanf("%d", &info);
-    insere(teste2, info);
-    scanf("%d", &info);
-    insere(teste2, info);
-    scanf("%d", &info);
-    insere(teste2, info);
-    scanf("%d", &info);
-    insere(teste2, info);
-    scanf("%d", &info);
-    insere(teste2, info);
-    scanf("%d", &info);
-    insere(teste2, info);
-    scanf("%d", &info);
-    insere(teste2, info);
-    scanf("%d", &info);
-    insere(teste2, info);
+
+    insere(teste2, 11);
+
+    insere(teste2, 5);
+
+    insere(teste2, 2);
+
+    insere(teste2, 8);
+
+    insere(teste2, 14);
+
+    insere(teste2, 22);
+
+    insere(teste2, 15);
+
+    insere(teste2, 27);
+
+    insere(teste2, 25);
     fclose(teste2);
 
     printf("-------------------------------------------------------------\n");
@@ -281,6 +376,14 @@ int main()
     teste3 = fopen("bdcodigos.bin", "rb+");
     cab = le_cabecalho_codigos(teste3);
     //printf("Raiz %d  Topo %d Livre %d\n", cab->pos_raiz, cab->pos_topo, cab->pos_livre);
+    imprimi_lista(teste3);
+    /* imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz); */
+    printf("\n-------------------------------------------------------------\n");
+    deleta_o_codigo_na_arvore(teste3, 14, cab->pos_raiz);
+    //imprimi_lista(teste3);
+    /* imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz);
+    deleta_o_codigo_na_arvore(teste3,5, cab->pos_raiz); */
+    printf("\n-------------------------------------------------------------\n");
     imprimi_lista(teste3);
     imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz);
     fclose(teste3);
