@@ -20,7 +20,6 @@ typedef struct No_Codigo
     int direita;
 } No_Codigo;
 
-
 //Escreve um n ́o em uma determinada posi ̧c~ao do arquivo
 //Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
 // pos deve ser uma posi ̧c~ao v ́alida do arquivo
@@ -208,7 +207,20 @@ int maximo_codigo(FILE *arq, int pos)
         return maximo_codigo(arq, no_aux->direita);
     }
     else
-        return pos;
+        return no_aux->info;
+}
+
+int minimo_codigo(FILE *arq, int pos)
+{
+    No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+    no_aux = le_no_codigo(arq, pos);
+
+    if (no_aux->esquerda != -1)
+    {
+        return minimo_codigo(arq, no_aux->esquerda);
+    }
+    else
+        return no_aux->info;
 }
 
 void imprimi_lista(FILE *arq)
@@ -222,7 +234,7 @@ void imprimi_lista(FILE *arq)
     while (fread(&x, sizeof(No_Codigo), 1, arq))
     {
 
-        printf("\n %d - Codigo:  %d , direita: %d , esquerda: %d  \n", i, x.info, x.direita, x.esquerda);
+        printf("\n %d - Codigo:  %d , esquerda: %d , direita: %d  \n", i, x.info, x.esquerda, x.direita);
         i++;
     }
 }
@@ -260,17 +272,53 @@ void imprimir_arvore_binaria_na_notacao(FILE *arq, int pos)
     printf("]");
 }
 
-void excluir_codigo(FILE *arq , int pos , Codigo codigo){
-    No_Codigo *no = (No_Codigo *) malloc(sizeof(No_Codigo));
+int excluir_codigo(FILE *arq, int pos, Codigo codigo){
 
-    if(codigo > no->info){ //navega para direita
-        excluir_codigo(arq,no->direita,codigo);
-    }else if (codigo < no->esquerda){ //navega para esquerda
-        excluir_codigo(arq,no->esquerda,codigo);
-    }else { // encontrou 
-        
+    No_Codigo *no = (No_Codigo *)malloc(sizeof(No_Codigo));
+    no = le_no_codigo(arq, pos);
+   
+    if (codigo > no->info){ //navega para direita
+        no->direita = excluir_codigo(arq, no->direita, codigo);
+        printf(" codigo %d ,direita %d\n",no->info,no->direita);
+        return no->direita;
     }
 
+    else if (codigo < no->info){ //navega para esquerda
+        printf(" codigo %d ,esquerda %d\n",no->info,no->esquerda);
+        
+
+        no->esquerda = excluir_codigo(arq, no->esquerda, codigo);
+        
+        escreve_no_codigo(arq,no,pos);
+        return no->esquerda;
+    }
+    else{ // encontrou
+        if (no->esquerda == -1 && no->direita == -1){ // no folha
+
+            no->esquerda = -1;
+            no->pos_livro = -1;
+            no->direita = -1;
+            Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+            cab = le_cabecalho_codigos(arq);
+
+            no->info = cab->pos_livre;
+            cab->pos_livre = pos;
+            escreve_cabecalho_codigo(arq, cab);
+            escreve_no_codigo(arq, no, pos);
+
+            return -1;
+        }
+        if (no->esquerda == -1){ //somente filho a direita
+            no->info = minimo_codigo(arq, no->direita);
+            no->direita = excluir_codigo(arq, no->direita, no->info);
+            return no->direita;
+        }
+        else{ // dois filhos ou 1 a esquerda
+            no->info = maximo_codigo(arq, no->esquerda);
+            no->esquerda = excluir_codigo(arq, no->esquerda, no->info);
+            return no->esquerda;
+        }
+    }
 }
 
 int main()
@@ -323,7 +371,9 @@ int main()
     /* imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz); */
     printf("\n-------------------------------------------------------------\n");
     imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz);
-    //deleta_o_codigo_na_arvore(teste3, 11, cab->pos_raiz);
+    int i;
+
+    excluir_codigo(teste3, cab->pos_raiz, 11);
 
     //imprimi_lista(teste3);
     /* imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz);
