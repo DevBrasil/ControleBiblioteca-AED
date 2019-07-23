@@ -210,10 +210,10 @@ int maximo_codigo(FILE *arq, int pos)
 
     if (no_aux->direita != -1)
     {
-        maximo_codigo(arq, no_aux->direita);
+        return maximo_codigo(arq, no_aux->direita);
     }
     else
-        return no_aux->info;
+        return pos;
 }
 void deleta_o_codigo_na_arvore(FILE *arq, Codigo info, int pos)
 {
@@ -241,42 +241,99 @@ void deleta_o_codigo_na_arvore(FILE *arq, Codigo info, int pos)
             if (no_aux->info < pai->info)
             { //filho esquerda
                 pai->esquerda = -1;
-                printf("\n1 filho = %d , pai = %d direita = %d esquerda = %d \n",no_aux->info,pai->info,pai->direita,pai->esquerda);
+                printf("\n1 filho = %d , pai = %d direita = %d esquerda = %d \n", no_aux->info, pai->info, pai->direita, pai->esquerda);
             }
             else
             { //filho a direita
                 pai->direita = -1;
-                printf("\n2 filho = %d ,pai = %d direita = %d esquerda = %d \n",no_aux->info,pai->info,pai->direita,pai->esquerda);
-
+                printf("\n2 filho = %d ,pai = %d direita = %d esquerda = %d \n", no_aux->info, pai->info, pai->direita, pai->esquerda);
             }
             escreve_no_codigo(arq, pai, no_aux->pai);
             Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
             cab = le_cabecalho_codigos(arq);
-            escreve_no_codigo(arq, pai, no_aux->pai);
+
             no_aux->direita = -1;
             no_aux->esquerda = -1;
             no_aux->pai = -1;
             no_aux->info = cab->pos_livre;
+            escreve_no_codigo(arq, no_aux, pos);
             cab->pos_livre = pos;
-            escreve_no_codigo(arq, no_aux, cab->pos_livre);
             escreve_cabecalho_codigo(arq, cab);
         }
         else if (no_aux->esquerda == -1)
         { //so tem filho para direita
-            printf("caralho da direita \n");
-            No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo));
-            aux = le_no_codigo(arq, no_aux->direita);
-            no_aux->info = aux->info;
+            Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+            cab = le_cabecalho_codigos(arq);
+
+            No_Codigo *pai = (No_Codigo *)malloc(sizeof(No_Codigo));
+            pai = le_no_codigo(arq, no_aux->pai);
+            pai->direita = no_aux->direita;
+            escreve_no_codigo(arq, pai, no_aux->pai);
+
+            No_Codigo *filho_dir = (No_Codigo *)malloc(sizeof(No_Codigo));
+            filho_dir = le_no_codigo(arq, no_aux->direita);
+            filho_dir->pai = no_aux->pai;
+            escreve_no_codigo(arq, filho_dir, no_aux->direita);
+
+            no_aux->direita = -1;
+            no_aux->esquerda = -1;
+            no_aux->pai = -1;
+            no_aux->info = cab->pos_livre;
+
+            cab->pos_livre = pos;
+
             escreve_no_codigo(arq, no_aux, pos);
-            deleta_o_codigo_na_arvore(arq, no_aux->info, no_aux->direita);
+            escreve_cabecalho_codigo(arq, cab);
         }
         else
         { //tem 2 filhos ou só da esquerda
             printf("\ntem dois filhos\n");
 
-            No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo));
-            aux = le_no_codigo(arq, no_aux->esquerda);
-            no_aux->info = maximo_codigo(arq, no_aux->esquerda);
+            int maior_posicao;
+            maior_posicao = maximo_codigo(arq, no_aux->esquerda);
+            No_Codigo *maior = (No_Codigo *)malloc(sizeof(No_Codigo));
+            maior = le_no_codigo(arq, maior_posicao);
+
+            if (maior->esquerda != -1)
+            { //o maior tem filho a esquerda
+
+                Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+                cab = le_cabecalho_codigos(arq);
+
+                No_Codigo *pai_maior = (No_Codigo *)malloc(sizeof(No_Codigo));
+                pai_maior = le_no_codigo(arq, maior->pai);
+                pai_maior->direita = maior->esquerda;
+
+                No_Codigo *filho_esquerda = (No_Codigo *)malloc(sizeof(No_Codigo));
+                filho_esquerda = le_no_codigo(arq, maior->esquerda);
+                filho_esquerda->pai = maior->pai;
+
+                maior->esquerda = no_aux->esquerda;
+                escreve_no_codigo(arq, pai_maior, maior->pai);
+                escreve_no_codigo(arq, filho_esquerda, maior->esquerda);
+            }
+
+            if (no_aux->direita != -1)
+            { //tem filho a direita tambem
+
+                No_Codigo *filho_direita = (No_Codigo *)malloc(sizeof(No_Codigo));
+                filho_direita = le_no_codigo(arq, no_aux->direita);
+                filho_direita->pai = maior_posicao;
+
+                maior->direita = no_aux->direita;
+                escreve_no_codigo(arq, filho_direita, maior->direita);
+            }
+
+            No_Codigo *pai = (No_Codigo *)malloc(sizeof(No_Codigo));
+            pai = le_no_codigo(arq, no_aux->pai);
+            
+        
+
+
+
+
+
+
             escreve_no_codigo(arq, no_aux, pos);
             deleta_o_codigo_na_arvore(arq, no_aux->info, no_aux->esquerda);
         }
@@ -380,6 +437,7 @@ int main()
     /* imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz); */
     printf("\n-------------------------------------------------------------\n");
     deleta_o_codigo_na_arvore(teste3, 14, cab->pos_raiz);
+    deleta_o_codigo_na_arvore(teste3, 25, cab->pos_raiz);
     //imprimi_lista(teste3);
     /* imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz);
     deleta_o_codigo_na_arvore(teste3,5, cab->pos_raiz); */
