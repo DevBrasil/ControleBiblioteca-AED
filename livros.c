@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 typedef struct Livro
 {
     int codigo;
@@ -84,6 +83,7 @@ void escreve_no(FILE *arq, No_livro *x, int pos)
 
 void insere(FILE *arq, Dados_Livro livro)
 {
+    int aux_pos;
     Cabecalho_livros_dados *cab = le_cabecalho(arq);
     No_livro x;
     x.livro = livro;
@@ -92,18 +92,24 @@ void insere(FILE *arq, Dados_Livro livro)
     { // n~ao h ́a n ́os livres, ent~ao usar o topo
         escreve_no(arq, &x, cab->pos_topo);
         cab->pos_cabeca = cab->pos_topo;
+        aux_pos = cab->pos_topo;
         cab->pos_topo++;
+        escreve_cabecalho(arq, cab);
+        free(cab);
+        return aux_pos;
     }
     else
     { // usar n ́o da lista de livres
         No_livro *aux = le_no(arq, cab->pos_livre);
         escreve_no(arq, &x, cab->pos_livre);
         cab->pos_cabeca = cab->pos_livre;
+        aux_pos = cab->pos_livre;
         cab->pos_livre = aux->prox;
         free(aux);
+        escreve_cabecalho(arq, cab);
+        free(cab);
+        return aux_pos;
     }
-    escreve_cabecalho(arq, cab);
-    free(cab);
 }
 
 //Retira um n ́o da lista
@@ -197,14 +203,35 @@ void teste()
     Dados_Livro x5;
     Dados_Livro x6;
     Dados_Livro x7;
-    
-    strcpy(x.titulo, "Rei das gambiarras");strcpy(x.autor,"Fernando brasil"); x.codigo = 155; x.exemplares=1457;
-    strcpy(x2.titulo, "So colocar que funciona");strcpy(x2.autor,"Ingo top"); x2.codigo = 156; x2.exemplares=999;
-    strcpy(x3.titulo, "Cade o socket?");strcpy(x3.autor,"Felipe Android"); x3.codigo = 157; x3.exemplares=1457;
-    strcpy(x4.titulo, "A merda que é o GoogleAds");strcpy(x4.autor,"Filipe"); x4.codigo = 158; x4.exemplares=588;
-    strcpy(x5.titulo, "Crescer ainda mais");strcpy(x5.autor,"Dr Barroncas"); x5.codigo = 159; x5.exemplares=1457;
-    strcpy(x6.titulo, "Quais sao suas metas?");strcpy(x6.autor,"Coach Anisio"); x6.codigo = 160; x6.exemplares=145557;
-    strcpy(x7.titulo, "Faz o narga pitando um Fox!");strcpy(x7.autor,"Alecs Fox"); x7.codigo = 161; x7.exemplares=188457;
+
+    strcpy(x.titulo, "Rei das gambiarras");
+    strcpy(x.autor, "Fernando brasil");
+    x.codigo = 155;
+    x.exemplares = 1457;
+    strcpy(x2.titulo, "So colocar que funciona");
+    strcpy(x2.autor, "Ingo top");
+    x2.codigo = 156;
+    x2.exemplares = 999;
+    strcpy(x3.titulo, "Cade o socket?");
+    strcpy(x3.autor, "Felipe Android");
+    x3.codigo = 157;
+    x3.exemplares = 1457;
+    strcpy(x4.titulo, "A merda que é o GoogleAds");
+    strcpy(x4.autor, "Filipe");
+    x4.codigo = 158;
+    x4.exemplares = 588;
+    strcpy(x5.titulo, "Crescer ainda mais");
+    strcpy(x5.autor, "Dr Barroncas");
+    x5.codigo = 159;
+    x5.exemplares = 1457;
+    strcpy(x6.titulo, "Quais sao suas metas?");
+    strcpy(x6.autor, "Coach Anisio");
+    x6.codigo = 160;
+    x6.exemplares = 145557;
+    strcpy(x7.titulo, "Faz o narga pitando um Fox!");
+    strcpy(x7.autor, "Alecs Fox");
+    x7.codigo = 161;
+    x7.exemplares = 188457;
 
     FILE *teste;
     teste = fopen("bd.bin", "wb");
