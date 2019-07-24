@@ -81,7 +81,7 @@ void escreve_no(FILE *arq, No_livro *x, int pos)
     fwrite(x, sizeof(No_livro), 1, arq);
 }
 
-void insere(FILE *arq, Dados_Livro livro)
+int insere_livro(FILE *arq, Dados_Livro livro)
 {
     int aux_pos;
     Cabecalho_livros_dados *cab = le_cabecalho(arq);
@@ -109,9 +109,26 @@ void insere(FILE *arq, Dados_Livro livro)
         escreve_cabecalho(arq, cab);
         free(cab);
         return aux_pos;
+
+        
     }
 }
+void adiciona_livro(Dados_Livro livro){
+    int posicao ;
 
+    FILE *arq;
+    arq = fopen("bdcodigos.bin", "rb+");
+    insere_codigo(arq, livro.codigo);
+
+     FILE *arq;
+    arq = fopen("bd.bin", "rb+");
+    posicao = insere_livro(arq, livro);
+
+    
+
+    
+
+}
 //Retira um n ́o da lista
 //Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
 //P ́os-condi ̧c~ao: n ́o retirado da lista caso perten ̧ca a ela
@@ -242,12 +259,12 @@ void teste()
     FILE *teste2;
     teste2 = fopen("bd.bin", "rb+");
 
-    insere(teste2, x);
-    insere(teste2, x2);
-    insere(teste2, x3);
-    insere(teste2, x4);
-    insere(teste2, x5);
-    insere(teste2, x6);
+    insere_livro(teste2, x);
+    insere_livro(teste2, x2);
+    insere_livro(teste2, x3);
+    insere_livro(teste2, x4);
+    insere_livro(teste2, x5);
+    insere_livro(teste2, x6);
     imprimi_lista(teste2);
     fclose(teste2);
 
@@ -263,7 +280,7 @@ void teste()
 
     FILE *teste5;
     teste5 = fopen("bd.bin", "rb+");
-    insere(teste, x7);
+    insere_livro(teste, x7);
     imprimi_lista(teste5);
     fclose(teste5);
 

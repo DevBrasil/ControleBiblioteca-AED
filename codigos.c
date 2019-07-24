@@ -173,7 +173,7 @@ int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
     }
 }
 
-int insere(FILE *arq, Codigo info)
+int insere_codigo(FILE *arq, Codigo info)
 {
     Cabecalho_Codigo *cab = le_cabecalho_codigos(arq);
     No_Codigo x;
@@ -342,23 +342,23 @@ int main()
     FILE *teste2;
     teste2 = fopen("bdcodigos.bin", "rb+");
 
-    insere(teste2, 11);
+    insere_codigo(teste2, 11);
 
-    insere(teste2, 5);
+    insere_codigo(teste2, 5);
 
-    insere(teste2, 2);
+    insere_codigo(teste2, 2);
 
-    insere(teste2, 8);
+    insere_codigo(teste2, 8);
 
-    insere(teste2, 14);
+    insere_codigo(teste2, 14);
 
-    insere(teste2, 22);
+    insere_codigo(teste2, 22);
 
-    insere(teste2, 15);
+    insere_codigo(teste2, 15);
 
-    insere(teste2, 27);
+    insere_codigo(teste2, 27);
 
-    insere(teste2, 25);
+    insere_codigo(teste2, 25);
     fclose(teste2);
 
     printf("-------------------------------------------------------------\n");
