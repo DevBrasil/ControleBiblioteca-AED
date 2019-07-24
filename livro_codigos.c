@@ -192,7 +192,6 @@ int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
     }
     else
     {
-
         printf("Codigo ja existente");
         return 0;
     }
@@ -366,6 +365,7 @@ int excluir_codigo(FILE *arq, int pos, Codigo codigo)
 
     return pos;
 }
+
 teste_codigo(){
  Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     int info;
