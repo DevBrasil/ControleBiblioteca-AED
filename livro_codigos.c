@@ -89,9 +89,6 @@ int acha_posicao_do_codigo(FILE *arq, int codigo, int pos)
     return -1;
 }
 
-
-
-
 void adiciona_posicao_do_livro(FILE *arq, int posicao_livro, int codigo)
 {
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
@@ -106,7 +103,6 @@ void adiciona_posicao_do_livro(FILE *arq, int posicao_livro, int codigo)
     no_aux->pos_livro = posicao_livro;
     escreve_no_codigo(arq, no_aux, posicao_codigo);
 }
-
 
 int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
 {
@@ -366,8 +362,48 @@ int excluir_codigo(FILE *arq, int pos, Codigo codigo)
     return pos;
 }
 
-teste_codigo(){
- Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+void printa_no(FILE *arq, int pos)
+{
+    No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+    no_aux = le_no_codigo(arq, pos);
+
+    printf(" %d ", no_aux->info);
+}
+
+void printa_nivel(FILE *arq, int pos, int nivel, int final)
+{
+
+    No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+    no_aux = le_no_codigo(arq, pos);
+
+    if (nivel == final)
+    {
+        printf("%d ", no_aux->info);
+    }
+
+    nivel++;
+
+    if (nivel <= final)
+    {
+        if (no_aux->esquerda != -1 && no_aux->direita != -1)
+        { //2 filhos
+            printa_nivel(arq, no_aux->esquerda, nivel, final);
+            printa_nivel(arq, no_aux->direita, nivel, final);
+        }
+        else if (no_aux->esquerda != -1)
+        { //1 filho a esquerda
+            printa_nivel(arq, no_aux->esquerda, nivel, final);
+        }
+        else if (no_aux->direita != -1)
+        { //1 filho a direita
+            printa_nivel(arq, no_aux->direita, nivel, final);
+        }
+    }
+}
+
+void teste_codigo()
+{
+    Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     int info;
     FILE *teste;
     teste = fopen("bdcodigos.bin", "wb");
@@ -421,16 +457,24 @@ teste_codigo(){
 
     //imprimi_lista(teste3);
     /* imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz); */
-    excluir_codigo(teste3, cab->pos_raiz, 11);
+    //excluir_codigo(teste3, cab->pos_raiz, 11);
+    //insere_codigo(teste2, 28);
 
     printf("\n-------------------------------------------------------------\n");
     imprimi_lista(teste3);
     imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz);
+    printf("\n \n");
+
+    for (int i = 1; i < 15; i++)
+    {
+        printa_nivel(teste3, cab->pos_raiz, 1, i);
+        printf("\n");
+    }
+
     fclose(teste3);
     printf("\n-------------------------------------------------------------\n");
-
 }
-/* int main()
+int main()
 {
-   teste_codigo();
-} */
+    teste_codigo();
+}
