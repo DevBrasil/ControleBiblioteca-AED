@@ -71,55 +71,48 @@ Cabecalho_Codigo *le_cabecalho_codigos(FILE *arq)
 
 int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
 {
+    printf("adicionando info = %d\n", info);
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     cab = le_cabecalho_codigos(arq);
-    fseek(arq, sizeof(Cabecalho_Codigo) + pos * sizeof(No_Codigo), SEEK_SET);
+
     No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
-    fread(no_aux, sizeof(No_Codigo), 1, arq);
+    no_aux = le_no_codigo(arq, pos);
 
     No_Codigo *novo = (No_Codigo *)malloc(sizeof(No_Codigo));
     novo->direita = -1;
     novo->esquerda = -1;
     novo->info = info;
 
-    if (no_aux->info < novo->info)
+    if (no_aux->info < info)
     { //adição a direita
         if (no_aux->direita != -1)
         { //ele ja tem filho da direita
-            printf("Ele tem filho a direita\n");
+
             adiciona_codigo_no_bd_codigos(arq, novo->info, no_aux->direita);
         }
         else
-        { //nao tem filho
-            printf("Ele nao tem filho a direita\n");
+        { //nao tem filho a direita
             if (cab->pos_livre != -1)
-            { //adicionar na posicao livre
-                No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+            {                                                 //adicionar na posicao livre
+                escreve_no_codigo(arq, novo, cab->pos_livre); // escreve o no na posicao livre
+
+                No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo)); // le a posicao livre
                 aux = le_no_codigo(arq, cab->pos_livre);
 
-                no_aux->direita = cab->pos_livre;
+                no_aux->direita = cab->pos_livre; //color o novo membro como filho da direita
+                cab->pos_livre = aux->info;       //encadear a lista de nos livres
 
-                if (aux->info == -1)
-                { //so tem um no livre
-                    cab->pos_livre = -1;
-                }
-                else
-                { //tem mais de um no livre
-                    cab->pos_livre = aux->info;
-                }
-
-                no_aux->direita = cab->pos_livre;
                 escreve_no_codigo(arq, no_aux, pos);
-                escreve_no_codigo(arq, novo, no_aux->direita);
                 escreve_cabecalho_codigo(arq, cab);
             }
             else
-            { //nao tem posicao livre
-                printf("Ele nao tem posicao livre\n");
-                no_aux->direita = cab->pos_topo;
+            {                                                //nao tem posicao livre
+                escreve_no_codigo(arq, novo, cab->pos_topo); // escreve o no na posicao topo
+
+                no_aux->direita = cab->pos_topo; //color o novo membro como filho da direita
+                cab->pos_topo++;                 //atualizar o topo da arvore
+
                 escreve_no_codigo(arq, no_aux, pos);
-                escreve_no_codigo(arq, novo, no_aux->direita);
-                cab->pos_topo++;
                 escreve_cabecalho_codigo(arq, cab);
             }
         }
@@ -127,41 +120,33 @@ int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
     else if (no_aux->info > info)
     { //adição a esquerda
         if (no_aux->esquerda != -1)
-        { //ele ja tem filho na esquerda
-            printf("Ele tem filho a esquerda\n");
+        { //ele ja tem filho da esquerda
+
             adiciona_codigo_no_bd_codigos(arq, novo->info, no_aux->esquerda);
         }
         else
-        { //nao tem filho
-            printf("Ele nao tem filho a esquerda\n");
+        { //nao tem filho a direita
             if (cab->pos_livre != -1)
-            { //adicionar na posicao livre
-                No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+            {                                                 //adicionar na posicao livre
+                escreve_no_codigo(arq, novo, cab->pos_livre); // escreve o no na posicao livre
+
+                No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo)); // le a posicao livre
                 aux = le_no_codigo(arq, cab->pos_livre);
 
-                no_aux->esquerda = cab->pos_livre;
+                no_aux->esquerda = cab->pos_livre; //color o novo membro como filho da direita
+                cab->pos_livre = aux->info;        //encadear a lista de nos livres
 
-                if (aux->info == -1)
-                { //so tem um no livre
-                    cab->pos_livre = -1;
-                }
-                else
-                { //tem mais de um no livre
-                    cab->pos_livre = aux->info;
-                }
-
-                no_aux->esquerda = cab->pos_livre;
                 escreve_no_codigo(arq, no_aux, pos);
-                escreve_no_codigo(arq, novo, no_aux->esquerda);
                 escreve_cabecalho_codigo(arq, cab);
             }
             else
-            { //nao tem posicao livre
-                printf("Ele nao tem posicao livre\n");
-                no_aux->esquerda = cab->pos_topo;
+            {                                                //nao tem posicao livre
+                escreve_no_codigo(arq, novo, cab->pos_topo); // escreve o no na posicao topo
+
+                no_aux->esquerda = cab->pos_topo; //color o novo membro como filho da direita
+                cab->pos_topo++;                  //atualizar o topo da arvore
+
                 escreve_no_codigo(arq, no_aux, pos);
-                escreve_no_codigo(arq, novo, no_aux->esquerda);
-                cab->pos_topo++;
                 escreve_cabecalho_codigo(arq, cab);
             }
         }
@@ -234,9 +219,11 @@ void imprimi_lista(FILE *arq)
     while (fread(&x, sizeof(No_Codigo), 1, arq))
     {
 
-        printf("\n %d - Codigo:  %d , esquerda: %d , direita: %d  \n", i, x.info, x.esquerda, x.direita);
+        printf("\n[%d] - Codigo:  %d , esquerda: %d , direita: %d  \n", i, x.info, x.esquerda, x.direita);
         i++;
     }
+
+    printf("\n");
 }
 void imprimir_arvore_binaria_na_notacao(FILE *arq, int pos)
 {
@@ -272,31 +259,35 @@ void imprimir_arvore_binaria_na_notacao(FILE *arq, int pos)
     printf("]");
 }
 
-int excluir_codigo(FILE *arq, int pos, Codigo codigo){
-
+int excluir_codigo(FILE *arq, int pos, Codigo codigo)
+{
 
     No_Codigo *no = (No_Codigo *)malloc(sizeof(No_Codigo));
     no = le_no_codigo(arq, pos);
 
-    printf("CODIGO = %d - ",no->info);
+    printf("CODIGO = %d - ", no->info);
 
-    if (codigo > no->info){ //navega para direita
-        printf("vai para direta \n");
+    if (codigo > no->info)
+    { //navega para direita
+        printf("vai para direita \n");
         no->direita = excluir_codigo(arq, no->direita, codigo);
-        escreve_no_codigo(arq,no,pos);
-        printf("CODIGO = %d agora tem dir como %d \n",no->info, no->direita);
+        escreve_no_codigo(arq, no, pos);
+        printf("CODIGO = %d agora tem dir como %d \n", no->info, no->direita);
     }
 
-    else if (codigo < no->info){ //navega para esquerda
+    else if (codigo < no->info)
+    { //navega para esquerda
         printf("vai para esquerda \n");
         no->esquerda = excluir_codigo(arq, no->esquerda, codigo);
-        escreve_no_codigo(arq,no,pos);
-        printf("CODIGO = %d agora tem esq como %d \n",no->info, no->esquerda);
+        escreve_no_codigo(arq, no, pos);
+        printf("CODIGO = %d agora tem esq como %d \n", no->info, no->esquerda);
     }
-    else if(codigo == no->info){ // encontrou
+    else if (codigo == no->info)
+    { // encontrou
         printf("excluir \n");
 
-        if (no->esquerda == -1 && no->direita == -1){ // no folha
+        if (no->esquerda == -1 && no->direita == -1)
+        { // no folha
 
             printf("folha \n");
 
@@ -313,15 +304,21 @@ int excluir_codigo(FILE *arq, int pos, Codigo codigo){
 
             return -1;
         }
-        if (no->esquerda == -1){ //somente filho a direita
+        if (no->esquerda == -1)
+        { //somente filho a direita
+            printf("so tem filho pra direita \n");
             no->info = minimo_codigo(arq, no->direita);
-            no->direita = excluir_codigo(arq, no->direita, codigo);
+            printf("teste %d \n", no->info);
+            no->direita = excluir_codigo(arq, no->direita, no->info);
+            escreve_no_codigo(arq, no, pos);
             return pos;
         }
-        else{ // dois filhos ou 1 a esquerda
+        else
+        { // dois filhos ou 1 a esquerda
             no->info = maximo_codigo(arq, no->esquerda);
-            printf("VAI EXCLUIR A BOLITA %d\n",no->info);
+            printf("VAI EXCLUIR A BOLITA %d\n", no->info);
             no->esquerda = excluir_codigo(arq, no->esquerda, no->info);
+            escreve_no_codigo(arq, no, pos);
 
             return pos;
         }
@@ -386,7 +383,8 @@ int main()
 
     //imprimi_lista(teste3);
     /* imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz); */
-    excluir_codigo(teste3,25, cab->pos_raiz);
+    excluir_codigo(teste3, cab->pos_raiz, 11);
+
     printf("\n-------------------------------------------------------------\n");
     imprimi_lista(teste3);
     imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz);
