@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "livros_dados.h"
+
 typedef int Codigo;
 
 typedef struct Cabecalho_Codigo
@@ -90,8 +92,6 @@ int acha_posicao_do_codigo(FILE *arq, int codigo, int pos)
 }
 
 
-
-
 void adiciona_posicao_do_livro(FILE *arq, int posicao_livro, int codigo)
 {
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
@@ -110,7 +110,7 @@ void adiciona_posicao_do_livro(FILE *arq, int posicao_livro, int codigo)
 
 int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
 {
-    printf("adicionando info = %d\n", info);
+    
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     cab = le_cabecalho_codigos(arq);
 
@@ -366,7 +366,7 @@ int excluir_codigo(FILE *arq, int pos, Codigo codigo)
     return pos;
 }
 
-teste_codigo(){
+void teste_codigos(){
  Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     int info;
     FILE *teste;
@@ -433,4 +433,5 @@ teste_codigo(){
 /* int main()
 {
    teste_codigo();
-} */
+}
+ */

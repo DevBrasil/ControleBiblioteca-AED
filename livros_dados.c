@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "livro_codigos.h"
+
+
 typedef struct Livro
 {
     int codigo;
@@ -29,7 +32,7 @@ typedef struct
 //Escreve no arquivo o cabe ̧calho contendo as informa ̧c~oes da lista
 //Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
 //P ́os-condi ̧c~ao: cabe ̧calho escrito no arquivo
-void escreve_cabecalho(FILE *arq, Cabecalho_livros_dados *cab)
+void escreve_cabecalho_livro(FILE *arq, Cabecalho_livros_dados *cab)
 {
     fseek(arq, 0, SEEK_SET); //posiciona no in ́ıcio do arquivo
     fwrite(cab, sizeof(Cabecalho_livros_dados), 1, arq);
@@ -44,14 +47,14 @@ void cria_lista_vazia(FILE *arq)
     cab->pos_cabeca = -1;
     cab->pos_topo = 0;
     cab->pos_livre = -1;
-    escreve_cabecalho(arq, cab);
+    escreve_cabecalho_livro(arq, cab);
     free(cab);
 }
 
 //L^e o cabe ̧calho do arquivo contendo as informa ̧c~oes da lista
 //Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
 //P ́os-condi ̧c~ao: retorna o ponteiro para o cabe ̧calho lido
-Cabecalho_livros_dados *le_cabecalho(FILE *arq)
+Cabecalho_livros_dados *le_cabecalho_livro(FILE *arq)
 {
     Cabecalho_livros_dados *cab = (Cabecalho_livros_dados *)malloc(sizeof(Cabecalho_livros_dados));
     fseek(arq, 0, SEEK_SET); // posiciona no in ́ıcio do arquivo
@@ -63,7 +66,7 @@ Cabecalho_livros_dados *le_cabecalho(FILE *arq)
 //Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
 // pos deve ser uma posi ̧c~ao v ́alida da lista
 //P ́os-condi ̧c~ao: ponteiro para n ́o lido  ́e retornado
-No_livro *le_no(FILE *arq, int pos)
+No_livro *le_no_livro(FILE *arq, int pos)
 {
     No_livro *x = malloc(sizeof(No_livro));
     fseek(arq, sizeof(Cabecalho_livros_dados) + pos * sizeof(No_livro), SEEK_SET);
@@ -75,7 +78,7 @@ No_livro *le_no(FILE *arq, int pos)
 //Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
 // pos deve ser uma posi ̧c~ao v ́alida do arquivo
 //P ́os-condi ̧c~ao: n ́o escrito no arquivo
-void escreve_no(FILE *arq, No_livro *x, int pos)
+void escreve_livro_no(FILE *arq, No_livro *x, int pos)
 {
     fseek(arq, sizeof(Cabecalho_livros_dados) + pos * sizeof(No_livro), SEEK_SET);
     fwrite(x, sizeof(No_livro), 1, arq);
@@ -84,52 +87,57 @@ void escreve_no(FILE *arq, No_livro *x, int pos)
 int insere_livro(FILE *arq, Dados_Livro livro)
 {
     int aux_pos;
-    Cabecalho_livros_dados *cab = le_cabecalho(arq);
+    Cabecalho_livros_dados *cab = le_cabecalho_livro(arq);
     No_livro x;
     x.livro = livro;
     x.prox = cab->pos_cabeca;
     if (cab->pos_livre == -1)
     { // n~ao h ́a n ́os livres, ent~ao usar o topo
-        escreve_no(arq, &x, cab->pos_topo);
+        escreve_livro_no(arq, &x, cab->pos_topo);
         cab->pos_cabeca = cab->pos_topo;
         aux_pos = cab->pos_topo;
         cab->pos_topo++;
-        escreve_cabecalho(arq, cab);
+        escreve_cabecalho_livro(arq, cab);
         free(cab);
         return aux_pos;
     }
     else
     { // usar n ́o da lista de livres
-        No_livro *aux = le_no(arq, cab->pos_livre);
-        escreve_no(arq, &x, cab->pos_livre);
+        No_livro *aux = le_no_livro(arq, cab->pos_livre);
+        escreve_livro_no(arq, &x, cab->pos_livre);
         cab->pos_cabeca = cab->pos_livre;
         aux_pos = cab->pos_livre;
         cab->pos_livre = aux->prox;
         free(aux);
-        escreve_cabecalho(arq, cab);
+        escreve_cabecalho_livro(arq, cab);
         free(cab);
         return aux_pos;
     }
 }
-void adiciona_livro(Dados_Livro livro)
+void adiciona_livro()
 {
-    int posicao, aux, aux_codigo;
+    int posicao, aux=0, aux_codigo;
 
     FILE *arquivo_codigo;
     arquivo_codigo = fopen("bdcodigos.bin", "rb+");
     FILE *arq_livro;
     arq_livro = fopen("bd.bin", "rb+");
+    
+    Dados_Livro livro;
 
     scanf("%d", &aux_codigo);
-    while (aux != 0)
-    {
+    while (aux == 0)
+    { 
         aux = insere_codigo(arquivo_codigo, aux_codigo); //Insere o codigo dos livros
         scanf("%d", &aux_codigo);
-    }
+   }
 
     livro.codigo = aux_codigo;
-    scanf("[^\n]", livro.titulo);
-    scanf("[^\n]", livro.autor);
+     
+    scanf("%[^\n]", livro.titulo);
+    __fpurge(stdin);
+    scanf("%[^\n]", livro.autor);
+     
     scanf("%d", &livro.exemplares);
     posicao = insere_livro(arq_livro, livro);                         //Insere dados do livro
     adiciona_posicao_do_livro(arquivo_codigo, posicao, livro.codigo); //adiciona a posicao dos dados do livro
@@ -140,12 +148,12 @@ void adiciona_livro(Dados_Livro livro)
 //P ́os-condi ̧c~ao: n ́o retirado da lista caso perten ̧ca a ela
 void retira(FILE *arq, int codigo)
 {
-    Cabecalho_livros_dados *cab = le_cabecalho(arq);
+    Cabecalho_livros_dados *cab = le_cabecalho_livro(arq);
     int pos_aux = cab->pos_cabeca;
     int pos_ant = cab->pos_cabeca;
     No_livro *aux = NULL;
     while (pos_aux != -1 && // procura o elemento a ser retirado
-           ((aux = le_no(arq, pos_aux)) != NULL) &&
+           ((aux = le_no_livro(arq, pos_aux)) != NULL) &&
            aux->livro.codigo != codigo)
     {
         pos_ant = pos_aux;
@@ -161,30 +169,28 @@ void retira(FILE *arq, int codigo)
         }
         else
         { // remo ̧c~ao no meio
-            No_livro *ant = le_no(arq, pos_ant);
+            No_livro *ant = le_no_livro(arq, pos_ant);
             ant->prox = aux->prox;
-            escreve_no(arq, ant, pos_ant);
+            escreve_livro_no(arq, ant, pos_ant);
             free(ant);
         }
         aux->prox = cab->pos_livre; // torna o n ́o removido um n ́o livre
         cab->pos_livre = pos_aux;
-        escreve_no(arq, aux, pos_aux);
-        escreve_cabecalho(arq, cab);
+        escreve_livro_no(arq, aux, pos_aux);
+        escreve_cabecalho_livro(arq, cab);
         free(aux);
     }
     free(cab);
 }
 
-
-
 void procura_no(FILE *arq, int codigo)
 {
     
-    Cabecalho_livros_dados *cab = le_cabecalho(arq);
+    Cabecalho_livros_dados *cab = le_cabecalho_livro(arq);
     int pos_aux = cab->pos_cabeca;
     int pos_ant = cab->pos_cabeca;
     No_livro *aux = NULL;
-    while (pos_aux != -1 && /* procura o elemento a ser pesquisado */ ((aux = le_no(arq, pos_aux)) != NULL) && aux->livro.codigo != codigo)
+    while (pos_aux != -1 && /* procura o elemento a ser pesquisado */ ((aux = le_no_livro(arq, pos_aux)) != NULL) && aux->livro.codigo != codigo)
     {
         pos_ant = pos_aux;
         pos_aux = aux->prox;
@@ -194,7 +200,7 @@ void procura_no(FILE *arq, int codigo)
 
     if (pos_aux != -1)
     { //encontrou o elemento
-        aux = le_no(arq, pos_aux);
+        aux = le_no_livro(arq, pos_aux);
 
         printf("\nCodigo = %d , Autor = %s , Titulo = %s , Exemplares = %d\n", aux->livro.codigo, aux->livro.autor, aux->livro.titulo, aux->livro.exemplares);
     }
@@ -210,7 +216,7 @@ void imprimi_lista_livro(FILE *arq)
 {
     No_livro x;
     Cabecalho_livros_dados *cab = (Cabecalho_livros_dados *)malloc(sizeof(Cabecalho_livros_dados));
-    cab = le_cabecalho(arq);
+    cab = le_cabecalho_livro(arq);
 
     printf("\ncabeca= %d , topo=%d , livre= %d\n", cab->pos_cabeca, cab->pos_topo, cab->pos_livre);
 

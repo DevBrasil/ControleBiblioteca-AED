@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "livro_codigos.h": "c",
+        "livros_dados.h": "c"
     }
 }
