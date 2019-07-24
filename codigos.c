@@ -274,26 +274,31 @@ void imprimir_arvore_binaria_na_notacao(FILE *arq, int pos)
 
 int excluir_codigo(FILE *arq, int pos, Codigo codigo){
 
+
     No_Codigo *no = (No_Codigo *)malloc(sizeof(No_Codigo));
     no = le_no_codigo(arq, pos);
-   
+
+    printf("CODIGO = %d - ",no->info);
+
     if (codigo > no->info){ //navega para direita
+        printf("vai para direta \n");
         no->direita = excluir_codigo(arq, no->direita, codigo);
-        printf(" codigo %d ,direita %d\n",no->info,no->direita);
-        return no->direita;
+        escreve_no_codigo(arq,no,pos);
+        printf("CODIGO = %d agora tem dir como %d \n",no->info, no->direita);
     }
 
     else if (codigo < no->info){ //navega para esquerda
-        printf(" codigo %d ,esquerda %d\n",no->info,no->esquerda);
-        
-
+        printf("vai para esquerda \n");
         no->esquerda = excluir_codigo(arq, no->esquerda, codigo);
-        
         escreve_no_codigo(arq,no,pos);
-        return no->esquerda;
+        printf("CODIGO = %d agora tem esq como %d \n",no->info, no->esquerda);
     }
-    else{ // encontrou
+    else if(codigo == no->info){ // encontrou
+        printf("excluir \n");
+
         if (no->esquerda == -1 && no->direita == -1){ // no folha
+
+            printf("folha \n");
 
             no->esquerda = -1;
             no->pos_livro = -1;
@@ -310,15 +315,19 @@ int excluir_codigo(FILE *arq, int pos, Codigo codigo){
         }
         if (no->esquerda == -1){ //somente filho a direita
             no->info = minimo_codigo(arq, no->direita);
-            no->direita = excluir_codigo(arq, no->direita, no->info);
-            return no->direita;
+            no->direita = excluir_codigo(arq, no->direita, codigo);
+            return pos;
         }
         else{ // dois filhos ou 1 a esquerda
             no->info = maximo_codigo(arq, no->esquerda);
+            printf("VAI EXCLUIR A BOLITA %d\n",no->info);
             no->esquerda = excluir_codigo(arq, no->esquerda, no->info);
-            return no->esquerda;
+
+            return pos;
         }
     }
+
+    return pos;
 }
 
 int main()
@@ -373,11 +382,11 @@ int main()
     imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz);
     int i;
 
-    excluir_codigo(teste3, cab->pos_raiz, 11);
+    //excluir_codigo(teste3, cab->pos_raiz, 11);
 
     //imprimi_lista(teste3);
-    /* imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz);
-    deleta_o_codigo_na_arvore(teste3,5, cab->pos_raiz); */
+    /* imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz); */
+    excluir_codigo(teste3,25, cab->pos_raiz);
     printf("\n-------------------------------------------------------------\n");
     imprimi_lista(teste3);
     imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz);
