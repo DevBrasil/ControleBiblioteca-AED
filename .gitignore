@@ -1,7 +1,8 @@
 # Prerequisites
 *.d
-*.bin
+
 #Binarie files
+*.bin
 
 # Object files
 *.o
@@ -27,7 +28,7 @@
 # Shared objects (inc. Windows DLLs)
 *.dll
 *.so
-.so.
+*.so.*
 *.dylib
 
 # Executables
@@ -45,7 +46,7 @@
 *.pdb
 
 # Kernel Module Compile Results
-.mod
+*.mod*
 *.cmd
 .tmp_versions/
 modules.order
