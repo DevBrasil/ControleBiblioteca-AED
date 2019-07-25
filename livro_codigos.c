@@ -4,8 +4,7 @@
 
 #include "livros_dados.h"
 
-typedef int Codigo;
-
+//Estrutura de cabecalos de arquivo de arvore de codigos;
 typedef struct Cabecalho_Codigo
 {
     int pos_raiz;
@@ -14,6 +13,10 @@ typedef struct Cabecalho_Codigo
 
 } Cabecalho_Codigo;
 
+//Estrutura para armazenar o codigo de um livro;
+typedef int Codigo;
+
+//Estrutura no para representar o livro na arvore de codigos;
 typedef struct No_Codigo
 {
     Codigo info;
@@ -22,10 +25,6 @@ typedef struct No_Codigo
     int direita;
 } No_Codigo;
 
-//Escreve um n ́o em uma determinada posi ̧c~ao do arquivo
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-// pos deve ser uma posi ̧c~ao v ́alida do arquivo
-//P ́os-condi ̧c~ao: n ́o escrito no arquivo
 void escreve_no_codigo(FILE *arq, No_Codigo *x, int pos)
 {
     fseek(arq, sizeof(Cabecalho_Codigo) + pos * sizeof(No_Codigo), SEEK_SET);
@@ -48,10 +47,6 @@ void cria_arvore_vazia_codigo(FILE *arq)
     free(cab);
 }
 
-//l^e um n ́o em uma determinada posi ̧c~ao do arquivo
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-// pos deve ser uma posi ̧c~ao v ́alida da lista
-//P ́os-condi ̧c~ao: ponteiro para n ́o lido  ́e retornado
 No_Codigo *le_no_codigo(FILE *arq, int pos)
 {
     No_Codigo *x = malloc(sizeof(No_Codigo));
@@ -60,9 +55,6 @@ No_Codigo *le_no_codigo(FILE *arq, int pos)
     return x;
 }
 
-//L^e o cabe ̧calho do arquivo contendo as informa ̧c~oes da lista
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-//P ́os-condi ̧c~ao: retorna o ponteiro para o cabe ̧calho lido
 Cabecalho_Codigo *le_cabecalho_codigos(FILE *arq)
 {
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
@@ -70,6 +62,7 @@ Cabecalho_Codigo *le_cabecalho_codigos(FILE *arq)
     fread(cab, sizeof(Cabecalho_Codigo), 1, arq);
     return cab;
 }
+
 int acha_posicao_do_codigo(FILE *arq, int codigo, int pos)
 {
 
@@ -91,7 +84,7 @@ int acha_posicao_do_codigo(FILE *arq, int codigo, int pos)
     return -1;
 }
 
-void adiciona_posicao_do_livro(FILE *arq, int posicao_livro, int codigo)
+void adiciona_posicao_do_livro_no_codigo(FILE *arq, int posicao_livro, int codigo)
 {
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     cab = le_cabecalho_codigos(arq);
@@ -111,15 +104,18 @@ int posicao_do_livro(FILE *arq, int pos, int codigo)
     No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
     no_aux = le_no_codigo(arq, pos);
 
-    if(codigo > no_aux->info){
-        return posicao_do_livro(arq,no_aux->direita,codigo);
-    }else if(codigo < no_aux->info){
-        return posicao_do_livro(arq,no_aux->esquerda,codigo);
-    }else
+    if (codigo > no_aux->info)
+    {
+        return posicao_do_livro(arq, no_aux->direita, codigo);
+    }
+    else if (codigo < no_aux->info)
+    {
+        return posicao_do_livro(arq, no_aux->esquerda, codigo);
+    }
+    else
     {
         return no_aux->pos_livro;
     }
-    
 }
 
 int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
@@ -261,7 +257,7 @@ int minimo_codigo(FILE *arq, int pos)
         return no_aux->info;
 }
 
-void imprimi_lista(FILE *arq)
+void imprimi_lista_codigo(FILE *arq)
 {
     No_Codigo x;
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
@@ -278,6 +274,7 @@ void imprimi_lista(FILE *arq)
 
     printf("\n");
 }
+
 void imprimir_arvore_binaria_na_notacao(FILE *arq, int pos)
 {
     fseek(arq, sizeof(Cabecalho_Codigo) + pos * sizeof(No_Codigo), SEEK_SET);
@@ -419,6 +416,29 @@ void printa_nivel(FILE *arq, int pos, int nivel, int final)
     }
 }
 
+void printa_arvore_por_nivel()
+{
+    FILE *arquivo_codigo;
+    arquivo_codigo = fopen("bdcodigos.bin", "rb+");
+
+    Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+    cab = le_cabecalho_codigos(arquivo_codigo);
+
+    if (cab->pos_raiz == -1) //nao tem nenhum codigo cadastrado
+    {
+        printf("Nao existem livros cadastrados!\n");
+    }
+    else
+    {
+        for (int i = 0; i < 999; i++)
+        {
+            printa_nivel(arquivo_codigo, cab->pos_raiz, 1, i);
+        }
+    }
+
+    fclose(arquivo_codigo);
+}
+
 int existe_codigo(FILE *arq, int codigo, int pos)
 {
     if (pos == -1)
@@ -442,81 +462,3 @@ int existe_codigo(FILE *arq, int codigo, int pos)
 
     return 0;
 }
-
-void teste_codigo()
-{
-    Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
-    int info;
-    FILE *teste;
-    teste = fopen("bdcodigos.bin", "wb");
-    cria_arvore_vazia_codigo(teste);
-    fclose(teste);
-    printf("-------------------------------------------------------------\n");
-
-    FILE *teste1;
-    teste1 = fopen("bdcodigos.bin", "rb+");
-    cab = le_cabecalho_codigos(teste1);
-    printf("Raiz %d  Topo %d Livre %d\n", cab->pos_raiz, cab->pos_topo, cab->pos_livre);
-
-    fclose(teste1);
-    printf("-------------------------------------------------------------\n");
-
-    FILE *teste2;
-    teste2 = fopen("bdcodigos.bin", "rb+");
-
-    insere_codigo(teste2, 11);
-
-    insere_codigo(teste2, 5);
-
-    insere_codigo(teste2, 2);
-
-    insere_codigo(teste2, 8);
-
-    insere_codigo(teste2, 14);
-
-    insere_codigo(teste2, 22);
-
-    insere_codigo(teste2, 15);
-
-    insere_codigo(teste2, 27);
-
-    insere_codigo(teste2, 25);
-    fclose(teste2);
-
-    printf("-------------------------------------------------------------\n");
-
-    FILE *teste3;
-    teste3 = fopen("bdcodigos.bin", "rb+");
-    cab = le_cabecalho_codigos(teste3);
-    //printf("Raiz %d  Topo %d Livre %d\n", cab->pos_raiz, cab->pos_topo, cab->pos_livre);
-    imprimi_lista(teste3);
-    /* imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz); */
-    printf("\n-------------------------------------------------------------\n");
-    imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz);
-    int i;
-
-    //excluir_codigo(teste3, cab->pos_raiz, 11);
-
-    //imprimi_lista(teste3);
-    /* imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz); */
-    //excluir_codigo(teste3, cab->pos_raiz, 11);
-    //insere_codigo(teste2, 28);
-
-    printf("\n-------------------------------------------------------------\n");
-    imprimi_lista(teste3);
-    imprimir_arvore_binaria_na_notacao(teste3, cab->pos_raiz);
-    printf("\n \n");
-
-    for (int i = 1; i < 15; i++)
-    {
-        printa_nivel(teste3, cab->pos_raiz, 1, i);
-        printf("\n");
-    }
-
-    fclose(teste3);
-    printf("\n-------------------------------------------------------------\n");
-}
-/* int main()
-{
-    teste_codigo();
-} */

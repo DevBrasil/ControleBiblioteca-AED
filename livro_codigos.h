@@ -19,43 +19,105 @@ typedef struct No_Codigo
     int direita;
 } No_Codigo;
 
-//Escreve um n ́o em uma determinada posi ̧c~ao do arquivo
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-// pos deve ser uma posi ̧c~ao v ́alida do arquivo
-//P ́os-condi ̧c~ao: n ́o escrito no arquivo
+//Escreve um no em uma determinada posi ̧c~ao do arquivo
+//Precondicao: arquivo deve estar aberto e ser um arquivo de arvore
+//pos deve ser uma posicao valida do arquivo
+//Pos-condicao: no escrito no arquivo
 void escreve_no_codigo(FILE *arq, No_Codigo *x, int pos);
 
+//Escreve um cabecalho no arquivo
+//Precondicao: arquivo deve estar aberto e ser um arquivo de arvore
+//cab nao pode ser nulo
+//Pos-condicao: cabecalho escrito no arquivo
 void escreve_cabecalho_codigo(FILE *arq, Cabecalho_Codigo *cab);
 
+//inicia um arquivo de codigo vazio
+//Precondicao: arquivo deve estar aberto e ser um arquivo de arvore
+//Pos-condicao: arquivo de codigo sem nada na arvore criado
 void cria_arvore_vazia_codigo(FILE *arq);
 
-int existe_codigo(FILE *arq, int codigo, int pos);
-
-//l^e um n ́o em uma determinada posi ̧c~ao do arquivo
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-// pos deve ser uma posi ̧c~ao v ́alida da lista
-//P ́os-condi ̧c~ao: ponteiro para n ́o lido  ́e retornado
+//le um no em uma determinada posicao do arquivo
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//pos deve ser uma posicao v ́alida da lista
+//Pos-condicao: ponteiro para no lido  ́e retornado
 No_Codigo *le_no_codigo(FILE *arq, int pos);
 
-//L^e o cabe ̧calho do arquivo contendo as informa ̧c~oes da lista
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-//P ́os-condi ̧c~ao: retorna o ponteiro para o cabe ̧calho lido
+//Le o cabecalho do arquivo contendo as informacoes da lista
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//Pos-condicao: retorna o ponteiro para o cabe ̧calho lido
 Cabecalho_Codigo *le_cabecalho_codigos(FILE *arq);
+
+//Percorre a arvore no arquivo e devolve a posicao em que se econtra o codigo
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//Pos-condicao: retorna a posicao do codigo no arquivo
 int acha_posicao_do_codigo(FILE *arq, int codigo, int pos);
 
-void adiciona_posicao_do_livro(FILE *arq, int posicao_livro, int codigo);
+//Insere no codigo dentro da arvore a localizacao do livro no arquivo de dados
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//Pos-condicao: insere a posicao do livro no arquivo de codigos
+void adiciona_posicao_do_livro_no_codigo(FILE *arq, int posicao_livro, int codigo);
 
+//Percorre a arvore no arquivo e devolve a posicao em que se econtra o livro de tal codigo
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//o codigo deve existir
+//Pos-condicao: retorna a posicao do livro no arquivo de dados
+int posicao_do_livro(FILE *arq, int pos, int codigo);
+
+//Insere um novo codigo na pos
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//pos deve ser uma posicao valida
+//Pos-condicao: codigo inserido dentro da arvore de codigos na posicao
 int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos);
 
+//Insere um novo codigo dentro da arvore de codigos
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//Pos-condicao: codigo inserido dentro da arvore de codigos
 int insere_codigo(FILE *arq, Codigo info);
 
+//Procura pelo maior codigo da arvore apartir daquele no
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//Pos-condicao: retorna o maior codigo da arvore apartir daquele no
 int maximo_codigo(FILE *arq, int pos);
 
+//Procura pelo menor codigo da arvore apartir daquele no
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//Pos-condicao: retorna o menor codigo da arvore apartir daquele no
 int minimo_codigo(FILE *arq, int pos);
-void imprimi_lista(FILE *arq);
+
+//imprime a arvore inteira em forma de lista
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//Pos-condicao: imprime a arvore inteira em forma de lista
+void imprimi_lista_codigo(FILE *arq);
+
+//imprime a arvore inteira de forma binaria
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//Pos-condicao: imprime a arvore inteira e forma binaria
 void imprimir_arvore_binaria_na_notacao(FILE *arq, int pos);
 
+//Excluir um codigo dentro da arvore em uma pos exata
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//pos deve ser uma posicao valida
+//Pos-condicao: codigo excluido da arvore de codigos
 int excluir_codigo(FILE *arq, int pos, Codigo codigo);
 
-void teste_codigos();
+//Printa o codigo de uma determinada posicao na arvore
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//Pos-condicao: codigo mostrada na tela
+void printa_no(FILE *arq, int pos);
+
+//Printa os codigo de um nivel da arvore
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//Pos-condicao: codigos de tal nivel mostrados na tela
+void printa_nivel(FILE *arq, int pos, int nivel, int final);
+
+//Printa a arvore de codigos por niveis
+//Pre-condicao: nenhuma
+//Pos-condicao: arvore printada no console por niveis
+void printa_arvore_por_nivel();
+
+//Verifica se um codigo existe no arquivo de codigo
+//Precondicao: arquivo deve estar aberto e ser um arquivo de arvore
+//Pos-condicao: retorna se o codigo existe na arvore
+int existe_codigo(FILE *arq, int codigo, int pos);
+
 #endif

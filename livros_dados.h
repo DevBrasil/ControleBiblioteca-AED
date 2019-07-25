@@ -48,19 +48,12 @@ No_livro *le_no_livro(FILE *arq, int pos);
 // pos deve ser uma posi ̧c~ao v ́alida do arquivo
 //P ́os-condi ̧c~ao: n ́o escrito no arquivo
 void escreve_livro_no(FILE *arq, No_livro *x, int pos);
-void adiciona_livro();
-
-void adiciona_livro_entradas();
 
 //Retira um n ́o da lista
 //Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
 //P ́os-condi ̧c~ao: n ́o retirado da lista caso perten ̧ca a ela
-void retira(FILE *arq, int codigo);
+void retira(FILE *arq, int pos);
 
 void procura_no(FILE *arq, int codigo);
-
-void imprimi_lista_livro(FILE *arq);
-
-void teste();
 
 #endif

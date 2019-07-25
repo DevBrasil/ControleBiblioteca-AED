@@ -4,6 +4,7 @@
 
 #include "livro_codigos.h"
 #include "livros_dados.h"
+#include "integration.h"
 
 void teste()
 {
@@ -64,25 +65,20 @@ void teste()
   adiciona_livro(x4);
   adiciona_livro(x2);
 
-
   FILE *teste3;
   teste3 = fopen("bdcodigos.bin", "rb+");
   cab = le_cabecalho_codigos(teste3);
-  imprimi_lista(teste3);
-  
-  imprime_em_ordem_de_codigo(teste3,cab->pos_raiz);
+
+  imprime_em_ordem_de_codigo(teste3, cab->pos_raiz);
   fclose(teste3);
 
-
   atualizar_exmplares();
-
 
   FILE *teste4;
   teste4 = fopen("bdcodigos.bin", "rb+");
   cab = le_cabecalho_codigos(teste4);
-  imprimi_lista(teste4);
-  
-  imprime_em_ordem_de_codigo(teste3,cab->pos_raiz);
+
+  imprime_em_ordem_de_codigo(teste3, cab->pos_raiz);
   fclose(teste4);
 }
 
