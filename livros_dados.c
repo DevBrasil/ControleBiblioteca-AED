@@ -4,7 +4,6 @@
 
 #include "livro_codigos.h"
 
-
 typedef struct Livro
 {
     int codigo;
@@ -26,6 +25,7 @@ typedef struct
 typedef struct
 {
     Dados_Livro livro;
+    int ant;
     int prox;
 } No_livro;
 
@@ -90,10 +90,19 @@ int insere_livro(FILE *arq, Dados_Livro livro)
     Cabecalho_livros_dados *cab = le_cabecalho_livro(arq);
     No_livro x;
     x.livro = livro;
-    x.prox = cab->pos_cabeca;
+    x.ant = cab->pos_cabeca;
+    x.prox = -1;
+
     if (cab->pos_livre == -1)
     { // n~ao h ́a n ́os livres, ent~ao usar o topo
+        printf("colocabdo ant = %d , prox = %d\n", x.ant, x.prox);
         escreve_livro_no(arq, &x, cab->pos_topo);
+
+        No_livro *ant = le_no_livro(arq, x.ant);
+        ant->prox = cab->pos_topo;
+
+        escreve_livro_no(arq, ant, x.ant);
+
         cab->pos_cabeca = cab->pos_topo;
         aux_pos = cab->pos_topo;
         cab->pos_topo++;
@@ -103,89 +112,185 @@ int insere_livro(FILE *arq, Dados_Livro livro)
     }
     else
     { // usar n ́o da lista de livres
-        No_livro *aux = le_no_livro(arq, cab->pos_livre);
+        No_livro *livre = le_no_livro(arq, cab->pos_livre);
+
         escreve_livro_no(arq, &x, cab->pos_livre);
         cab->pos_cabeca = cab->pos_livre;
+
+        No_livro *ant = le_no_livro(arq, x.ant);
+        ant->prox = cab->pos_livre;
+
+        printf("no ant = %d \n", x.ant);
+
+        escreve_livro_no(arq, ant, x.ant);
+
         aux_pos = cab->pos_livre;
-        cab->pos_livre = aux->prox;
-        free(aux);
+        cab->pos_livre = livre->prox;
+        free(livre);
         escreve_cabecalho_livro(arq, cab);
         free(cab);
         return aux_pos;
     }
 }
-void adiciona_livro()
+
+void adiciona_livro_entradas()
 {
-    int posicao, aux=0, aux_codigo;
+    FILE *arquivo_codigo;
+    arquivo_codigo = fopen("bdcodigos.bin", "rb+");
+
+    Dados_Livro livro;
+
+    Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+    cab = le_cabecalho_codigos(arquivo_codigo);
+
+    int aux_codigo, aux = 1;
+    printf("Insira um codigo: ");
+    scanf("%d", &aux_codigo);
+
+    aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
+
+    while (aux == 1)
+    {
+        aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
+        printf("%d", aux);
+        printf("\nInsira um codigo novamente: ");
+        scanf("%d", &aux_codigo);
+    }
+
+    livro.codigo = aux_codigo;
+    __fpurge(stdin);
+    printf("\nInsira um titulo: ");
+    scanf("%[^\n]", livro.titulo);
+    __fpurge(stdin);
+    printf("\nInsira um autor: ");
+    scanf("%[^\n]", livro.autor);
+    printf("\nInsira o numero de exemplares: ");
+    scanf("%d", &livro.exemplares);
+    fclose(arquivo_codigo);
+
+    adiciona_livro(livro);
+}
+void adiciona_livro(Dados_Livro livro)
+{
+    int posicao, aux = 0, aux_codigo;
 
     FILE *arquivo_codigo;
     arquivo_codigo = fopen("bdcodigos.bin", "rb+");
     FILE *arq_livro;
     arq_livro = fopen("bd.bin", "rb+");
-    
-    Dados_Livro livro;
 
-    scanf("%d", &aux_codigo);
-    while (aux == 0)
-    { 
-        aux = insere_codigo(arquivo_codigo, aux_codigo); //Insere o codigo dos livros
-        scanf("%d", &aux_codigo);
-   }
-
-    livro.codigo = aux_codigo;
-     
-    scanf("%[^\n]", livro.titulo);
-    __fpurge(stdin);
-    scanf("%[^\n]", livro.autor);
-     
-    scanf("%d", &livro.exemplares);
+    insere_codigo(arquivo_codigo, livro.codigo);
     posicao = insere_livro(arq_livro, livro);                         //Insere dados do livro
     adiciona_posicao_do_livro(arquivo_codigo, posicao, livro.codigo); //adiciona a posicao dos dados do livro
+    fclose(arquivo_codigo);
+    fclose(arq_livro);
+}
+
+void exclui_livro()
+{
+    FILE *arquivo_codigo;
+    arquivo_codigo = fopen("bdcodigos.bin", "rb+");
+
+    Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+    cab = le_cabecalho_codigos(arquivo_codigo);
+
+    int aux = 1;
+    Codigo aux_codigo;
+
+    printf("\nInsira um codigo: ");
+    scanf("%d", &aux_codigo);
+
+    aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
+    while (aux == 0)
+    {
+        printf("\nInsira um codigo existente: ");
+        scanf("%d", &aux_codigo);
+        aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
+    }
+
+    int posicao = posicao_do_livro(arquivo_codigo, cab->pos_raiz, aux_codigo);
+
+    excluir_codigo(arquivo_codigo, cab->pos_raiz, aux_codigo);
+    fclose(arquivo_codigo);
+
+    FILE *teste2;
+    teste2 = fopen("bd.bin", "rb+");
+    retira(teste2, posicao);
+    fclose(teste2);
+}
+
+void imprime_livro(int pos)
+{
+    FILE *arquivo_livros;
+    arquivo_livros = fopen("bd.bin", "rb+");
+
+    No_livro *x = (No_livro *)malloc(sizeof(No_livro));
+
+    x = le_no_livro(arquivo_livros, pos);
+
+    printf("\nCodigo:  %d , Autor: %s , Titulo: %s , Exemplares: %d \n", x->livro.codigo, x->livro.autor, x->livro.titulo, x->livro.exemplares);
 }
 
 //Retira um n ́o da lista
 //Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
 //P ́os-condi ̧c~ao: n ́o retirado da lista caso perten ̧ca a ela
-void retira(FILE *arq, int codigo)
+void retira(FILE *arq, int pos)
 {
-    Cabecalho_livros_dados *cab = le_cabecalho_livro(arq);
-    int pos_aux = cab->pos_cabeca;
-    int pos_ant = cab->pos_cabeca;
-    No_livro *aux = NULL;
-    while (pos_aux != -1 && // procura o elemento a ser retirado
-           ((aux = le_no_livro(arq, pos_aux)) != NULL) &&
-           aux->livro.codigo != codigo)
-    {
-        pos_ant = pos_aux;
-        pos_aux = aux->prox;
-        free(aux);
-        aux = NULL;
-    }
-    if (pos_aux != -1)
-    { //encontrou o elemento
-        if (pos_ant == pos_aux)
-        { // remo ̧c~ao na cabe ̧ca
-            cab->pos_cabeca = aux->prox;
-        }
-        else
-        { // remo ̧c~ao no meio
-            No_livro *ant = le_no_livro(arq, pos_ant);
-            ant->prox = aux->prox;
-            escreve_livro_no(arq, ant, pos_ant);
-            free(ant);
-        }
-        aux->prox = cab->pos_livre; // torna o n ́o removido um n ́o livre
-        cab->pos_livre = pos_aux;
-        escreve_livro_no(arq, aux, pos_aux);
+
+    Cabecalho_livros_dados *cab = (Cabecalho_livros_dados *)malloc(sizeof(Cabecalho_livros_dados));
+
+    cab = le_cabecalho_livro(arq);
+
+    No_livro *aux = (No_livro *)malloc(sizeof(No_livro));
+    aux = le_no_livro(arq, pos);
+
+    printf("caralho %d\n", pos);
+
+    if (pos == cab->pos_cabeca)
+    { // remo ̧c~ao na cabe ̧ca
+        No_livro *ant = (No_livro *)malloc(sizeof(No_livro));
+        ant = le_no_livro(arq, aux->ant);
+        ant->prox = -1;
+
+        escreve_livro_no(arq, ant, aux->ant);
+
+        cab->pos_cabeca = aux->ant;
+
         escreve_cabecalho_livro(arq, cab);
-        free(aux);
+
+        free(ant);
     }
+    else
+    { // remo ̧c~ao no meio
+        No_livro *ant = (No_livro *)malloc(sizeof(No_livro));
+        No_livro *prox = (No_livro *)malloc(sizeof(No_livro));
+
+        ant = le_no_livro(arq, aux->ant);
+        prox = le_no_livro(arq, aux->prox);
+
+        ant->prox = aux->prox;
+        prox->ant = aux->ant;
+
+        escreve_livro_no(arq, ant, aux->ant);
+        escreve_livro_no(arq, prox, aux->prox);
+
+        free(ant);
+        free(prox);
+    }
+
+    aux->prox = cab->pos_livre; // torna o n ́o removido um n ́o livre
+    aux->ant = -1;
+    cab->pos_livre = pos;
+    escreve_livro_no(arq, aux, pos);
+    escreve_cabecalho_livro(arq, cab);
+    free(aux);
+
     free(cab);
 }
 
 void procura_no(FILE *arq, int codigo)
 {
-    
+
     Cabecalho_livros_dados *cab = le_cabecalho_livro(arq);
     int pos_aux = cab->pos_cabeca;
     int pos_ant = cab->pos_cabeca;
@@ -212,59 +317,108 @@ void procura_no(FILE *arq, int codigo)
     free(cab);
 }
 
-void imprimi_lista_livro(FILE *arq)
+void imprime_lista_livro(FILE *arq)
 {
     No_livro x;
     Cabecalho_livros_dados *cab = (Cabecalho_livros_dados *)malloc(sizeof(Cabecalho_livros_dados));
     cab = le_cabecalho_livro(arq);
 
     printf("\ncabeca= %d , topo=%d , livre= %d\n", cab->pos_cabeca, cab->pos_topo, cab->pos_livre);
-
+    int i = 0;
     while (fread(&x, sizeof(No_livro), 1, arq))
     {
-        printf("\nCodigo:  %d , Autor: %s , Titulo: %s , Exemplares: %d , %d\n", x.livro.codigo, x.livro.autor, x.livro.titulo, x.livro.exemplares, x.prox);
+        printf("\n[%d] - Codigo:  %d , Autor: %s , Titulo: %s , Exemplares: %d ,ant = %d ,prox = %d\n", i, x.livro.codigo, x.livro.autor, x.livro.titulo, x.livro.exemplares, x.ant, x.prox);
+        i++;
     }
 }
 
-void teste()
+void imprime_em_ordem_de_codigo(FILE *arq, int pos)
 {
-    Dados_Livro x;
-    Dados_Livro x2;
-    Dados_Livro x3;
-    Dados_Livro x4;
-    Dados_Livro x5;
-    Dados_Livro x6;
-    Dados_Livro x7;
+    No_Codigo *no = (No_Codigo *)malloc(sizeof(No_Codigo));
+    no = le_no_codigo(arq, pos);
 
-    strcpy(x.titulo, "Rei das gambiarras");
-    strcpy(x.autor, "Fernando brasil");
-    x.codigo = 155;
-    x.exemplares = 1457;
-    strcpy(x2.titulo, "So colocar que funciona");
-    strcpy(x2.autor, "Ingo top");
-    x2.codigo = 156;
-    x2.exemplares = 999;
-    strcpy(x3.titulo, "Cade o socket?");
-    strcpy(x3.autor, "Felipe Android");
-    x3.codigo = 157;
-    x3.exemplares = 1457;
-    strcpy(x4.titulo, "A merda que é o GoogleAds");
-    strcpy(x4.autor, "Filipe");
-    x4.codigo = 158;
-    x4.exemplares = 588;
-    strcpy(x5.titulo, "Crescer ainda mais");
-    strcpy(x5.autor, "Dr Barroncas");
-    x5.codigo = 159;
-    x5.exemplares = 1457;
-    strcpy(x6.titulo, "Quais sao suas metas?");
-    strcpy(x6.autor, "Coach Anisio");
-    x6.codigo = 160;
-    x6.exemplares = 145557;
-    strcpy(x7.titulo, "Faz o narga pitando um Fox!");
-    strcpy(x7.autor, "Alecs Fox");
-    x7.codigo = 161;
-    x7.exemplares = 188457;
+    if (no->esquerda != -1)
+    {
+        imprime_em_ordem_de_codigo(arq, no->esquerda);
+    }
+    imprime_livro(no->pos_livro);
 
+    if (no->direita != -1)
+    {
+        imprime_em_ordem_de_codigo(arq, no->direita);
+    }
+}
+
+void buscar_dados_do_livro()
+{
+    FILE *arquivo_codigo;
+    arquivo_codigo = fopen("bdcodigos.bin", "rb+");
+
+    Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+    cab = le_cabecalho_codigos(arquivo_codigo);
+
+    int aux = 1;
+    Codigo aux_codigo;
+
+    printf("\nInsira um codigo: ");
+    scanf("%d", &aux_codigo);
+
+    aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
+    while (aux == 0)
+    {
+        printf("\nInsira um codigo existente: ");
+        scanf("%d", &aux_codigo);
+        aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
+    }
+
+    int posicao = posicao_do_livro(arquivo_codigo, cab->pos_raiz, aux_codigo);
+
+    FILE *teste2;
+    teste2 = fopen("bd.bin", "rb+");
+    imprime_livro(posicao);
+    fclose(teste2);
+}
+
+void atualizar_exmplares(){
+    FILE *arquivo_codigo;
+    arquivo_codigo = fopen("bdcodigos.bin", "rb+");
+
+    Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+    cab = le_cabecalho_codigos(arquivo_codigo);
+
+    int aux = 1;
+    Codigo aux_codigo;
+
+    printf("\nInsira um codigo: ");
+    scanf("%d", &aux_codigo);
+
+    aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
+    while (aux == 0)
+    {
+        printf("\nInsira um codigo existente: ");
+        scanf("%d", &aux_codigo);
+        aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
+    }
+
+    int posicao = posicao_do_livro(arquivo_codigo, cab->pos_raiz, aux_codigo);
+
+    FILE *teste2;
+    teste2 = fopen("bd.bin", "rb+");
+    imprime_livro(posicao);
+    No_livro *livro = (No_livro *) malloc(sizeof(No_livro));
+    livro = le_no_livro(teste2, posicao);
+
+    printf("\nInsira a nova quantidade de exemplares do livro: ");
+    scanf("%d", &livro->livro.exemplares);
+
+    escreve_livro_no(teste2,livro,posicao);
+
+    fclose(teste2);
+}
+
+/* void teste()
+{
+    
     FILE *teste;
     teste = fopen("bd.bin", "wb");
     cria_lista_vazia(teste);
@@ -306,7 +460,7 @@ void teste()
     procura_no(teste6, 158);
     procura_no(teste6, 160);
     fclose(teste6);
-}
+} */
 
 /* int main()
 {

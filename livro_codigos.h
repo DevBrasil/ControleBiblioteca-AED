@@ -1,7 +1,5 @@
-#ifndef LIVRO_CODIGO   
+#ifndef LIVRO_CODIGO
 #define LIVRO_CODIGO
-
-
 
 typedef int Codigo;
 
@@ -31,6 +29,8 @@ void escreve_cabecalho_codigo(FILE *arq, Cabecalho_Codigo *cab);
 
 void cria_arvore_vazia_codigo(FILE *arq);
 
+int existe_codigo(FILE *arq, int codigo, int pos);
+
 //l^e um n ́o em uma determinada posi ̧c~ao do arquivo
 //Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
 // pos deve ser uma posi ̧c~ao v ́alida da lista
@@ -45,7 +45,6 @@ int acha_posicao_do_codigo(FILE *arq, int codigo, int pos);
 
 void adiciona_posicao_do_livro(FILE *arq, int posicao_livro, int codigo);
 
-
 int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos);
 
 int insere_codigo(FILE *arq, Codigo info);
@@ -59,4 +58,4 @@ void imprimir_arvore_binaria_na_notacao(FILE *arq, int pos);
 int excluir_codigo(FILE *arq, int pos, Codigo codigo);
 
 void teste_codigos();
-#endif 
+#endif

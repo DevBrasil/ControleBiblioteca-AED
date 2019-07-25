@@ -106,9 +106,25 @@ void adiciona_posicao_do_livro(FILE *arq, int posicao_livro, int codigo)
     escreve_no_codigo(arq, no_aux, posicao_codigo);
 }
 
+int posicao_do_livro(FILE *arq, int pos, int codigo)
+{
+    No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+    no_aux = le_no_codigo(arq, pos);
+
+    if(codigo > no_aux->info){
+        return posicao_do_livro(arq,no_aux->direita,codigo);
+    }else if(codigo < no_aux->info){
+        return posicao_do_livro(arq,no_aux->esquerda,codigo);
+    }else
+    {
+        return no_aux->pos_livro;
+    }
+    
+}
+
 int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
 {
-    
+
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     cab = le_cabecalho_codigos(arq);
 
@@ -256,7 +272,7 @@ void imprimi_lista(FILE *arq)
     while (fread(&x, sizeof(No_Codigo), 1, arq))
     {
 
-        printf("\n[%d] - Codigo:  %d , esquerda: %d , direita: %d  \n", i, x.info, x.esquerda, x.direita);
+        printf("\n[%d] - Codigo:  %d , esquerda: %d , direita: %d , pos_livro: %d \n", i, x.info, x.esquerda, x.direita, x.pos_livro);
         i++;
     }
 
@@ -403,6 +419,30 @@ void printa_nivel(FILE *arq, int pos, int nivel, int final)
     }
 }
 
+int existe_codigo(FILE *arq, int codigo, int pos)
+{
+    if (pos == -1)
+        return 0;
+    No_Codigo *no = (No_Codigo *)malloc(sizeof(No_Codigo));
+    no = le_no_codigo(arq, pos);
+
+    if (codigo > no->info && no->direita != -1)
+    { //navega para direita
+        return existe_codigo(arq, codigo, no->direita);
+    }
+
+    else if (codigo < no->info && no->esquerda != -1)
+    { //navega para esquerda
+        return existe_codigo(arq, codigo, no->esquerda);
+    }
+    else if (codigo == no->info)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
 void teste_codigo()
 {
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
@@ -476,7 +516,7 @@ void teste_codigo()
     fclose(teste3);
     printf("\n-------------------------------------------------------------\n");
 }
-int main()
+/* int main()
 {
     teste_codigo();
-}
+} */

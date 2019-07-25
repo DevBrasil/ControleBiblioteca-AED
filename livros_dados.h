@@ -1,4 +1,4 @@
-#ifndef LIVROS_DADOS   
+#ifndef LIVROS_DADOS
 #define LIVROS_DADOS
 
 typedef struct Livro
@@ -11,7 +11,9 @@ typedef struct Livro
 } Dados_Livro;
 
 // cabecalho do arquivo
- typedef struct {} Cabecalho_livros_dados;
+typedef struct
+{
+} Cabecalho_livros_dados;
 
 // estrutura de no para lista encadeada
 typedef struct
@@ -48,6 +50,8 @@ No_livro *le_no_livro(FILE *arq, int pos);
 void escreve_livro_no(FILE *arq, No_livro *x, int pos);
 void adiciona_livro();
 
+void adiciona_livro_entradas();
+
 //Retira um n ́o da lista
 //Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
 //P ́os-condi ̧c~ao: n ́o retirado da lista caso perten ̧ca a ela
@@ -59,4 +63,4 @@ void imprimi_lista_livro(FILE *arq);
 
 void teste();
 
-#endif 
+#endif

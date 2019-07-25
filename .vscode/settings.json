@@ -2,6 +2,7 @@
     "files.associations": {
         "stdio.h": "c",
         "livro_codigos.h": "c",
-        "livros_dados.h": "c"
+        "livros_dados.h": "c",
+        "stdlib.h": "c"
     }
 }
