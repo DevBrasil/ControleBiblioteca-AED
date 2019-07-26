@@ -1,9 +1,5 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
-#include "livro_codigos.h"
-#include "livros_dados.h"
+#ifndef INTEGRATION
+#define INTEGRATION
 
 //Insere um livro no arquivo de codigos e no de dados
 //Pre-condicao: livro nao pode ser null e nao pode existir nos arquivo
@@ -39,3 +35,5 @@ void atualizar_exmplares();
 //Pre-condicao: nenhuma
 //Pos-condicao: Mostra na tela as informacoes do livro
 void buscar_dados_do_livro();
+
+#endif

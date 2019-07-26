@@ -127,6 +127,8 @@ int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
     No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
     no_aux = le_no_codigo(arq, pos);
 
+    printf("no = %d ,", no_aux->info);
+
     No_Codigo *novo = (No_Codigo *)malloc(sizeof(No_Codigo));
     novo->direita = -1;
     novo->esquerda = -1;
@@ -215,7 +217,7 @@ int insere_codigo(FILE *arq, Codigo info)
 
     if (cab->pos_raiz == -1)
     { //nao tem raiz ainda
-        printf("entrou aqui onde tem um monte de coisa\n");
+        printf("Inserir raiz\n");
         x.direita = -1;
         x.esquerda = -1;
         escreve_no_codigo(arq, &x, cab->pos_topo);
@@ -277,36 +279,39 @@ void imprimi_lista_codigo(FILE *arq)
 
 void imprimir_arvore_binaria_na_notacao(FILE *arq, int pos)
 {
-    fseek(arq, sizeof(Cabecalho_Codigo) + pos * sizeof(No_Codigo), SEEK_SET);
-    No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
-    fread(no_aux, sizeof(No_Codigo), 1, arq);
-
-    printf("[");
-    if (no_aux->info != -1)
+    if (pos != -1)
     {
-        printf("%d,", no_aux->info);
+        fseek(arq, sizeof(Cabecalho_Codigo) + pos * sizeof(No_Codigo), SEEK_SET);
+        No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+        fread(no_aux, sizeof(No_Codigo), 1, arq);
 
-        if (no_aux->esquerda != -1)
+        printf("[");
+        if (no_aux->info != -1)
         {
-            imprimir_arvore_binaria_na_notacao(arq, no_aux->esquerda);
-            printf(",");
-        }
-        else
-        {
-            printf("[],");
-        }
+            printf("%d,", no_aux->info);
 
-        if (no_aux->direita != -1)
-        {
-            imprimir_arvore_binaria_na_notacao(arq, no_aux->direita);
-            // printf("");
+            if (no_aux->esquerda != -1)
+            {
+                imprimir_arvore_binaria_na_notacao(arq, no_aux->esquerda);
+                printf(",");
+            }
+            else
+            {
+                printf("[],");
+            }
+
+            if (no_aux->direita != -1)
+            {
+                imprimir_arvore_binaria_na_notacao(arq, no_aux->direita);
+                // printf("");
+            }
+            else
+            {
+                printf("[]");
+            }
         }
-        else
-        {
-            printf("[]");
-        }
+        printf("]");
     }
-    printf("]");
 }
 
 int excluir_codigo(FILE *arq, int pos, Codigo codigo)

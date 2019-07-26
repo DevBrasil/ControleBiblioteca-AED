@@ -5,6 +5,7 @@
 #include "livro_codigos.h"
 #include "livros_dados.h"
 #include "integration.h"
+#include "menu.h"
 
 void teste()
 {
@@ -84,5 +85,14 @@ void teste()
 
 int main()
 {
-  teste();
+  FILE *codigos = fopen("bdcodigos.bin", "wb");
+  FILE *dados = fopen("bd.bin", "wb+");
+
+  cria_arvore_vazia_codigo(codigos);
+  cria_lista_vazia(dados);
+
+  fclose(codigos);
+  fclose(dados);
+
+  menu_start();
 }

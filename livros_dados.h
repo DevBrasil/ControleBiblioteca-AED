@@ -22,38 +22,36 @@ typedef struct
     int prox;
 } No_livro;
 
-//Escreve no arquivo o cabe ̧calho contendo as informa ̧c~oes da lista
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-//P ́os-condi ̧c~ao: cabe ̧calho escrito no arquivo
+//Escreve no arquivo o cabe ̧calho contendo as informacoes da lista
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//Pos-condicao: cabe ̧calho escrito no arquivo
 void escreve_cabecalho_livro(FILE *arq, Cabecalho_livros_dados *cab);
 
 //Cria uma lista nova em arquivo
-//Pr ́e-condi ̧c~ao: arquivo aberto para leitura/escrita
-//P ́os-condi ̧c~ao: arquivo  ́e inicializado com uma lista vazia
+//Pre-condicao: arquivo aberto para leitura/escrita
+//Pos-condicao: arquivo  ́e inicializado com uma lista vazia
 void cria_lista_vazia(FILE *arq);
 
-//L^e o cabe ̧calho do arquivo contendo as informa ̧c~oes da lista
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-//P ́os-condi ̧c~ao: retorna o ponteiro para o cabe ̧calho lido
+//L^e o cabe ̧calho do arquivo contendo as informacoes da lista
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//Pos-condicao: retorna o ponteiro para o cabecalho lido
 Cabecalho_livros_dados *le_cabecalho_livro(FILE *arq);
 
-//l^e um n ́o em uma determinada posi ̧c~ao do arquivo
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-// pos deve ser uma posi ̧c~ao v ́alida da lista
-//P ́os-condi ̧c~ao: ponteiro para n ́o lido  ́e retornado
+//l^e um n ́o em uma determinada posicao do arquivo
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+// pos deve ser uma posicao valida da lista
+//Pos-condicao: ponteiro para no lido  ́e retornado
 No_livro *le_no_livro(FILE *arq, int pos);
 
-//Escreve um n ́o em uma determinada posi ̧c~ao do arquivo
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-// pos deve ser uma posi ̧c~ao v ́alida do arquivo
-//P ́os-condi ̧c~ao: n ́o escrito no arquivo
+//Escreve um no em uma determinada posicao do arquivo
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+// pos deve ser uma posicao valida do arquivo
+//Pos-condicao: no escrito no arquivo
 void escreve_livro_no(FILE *arq, No_livro *x, int pos);
 
-//Retira um n ́o da lista
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-//P ́os-condi ̧c~ao: n ́o retirado da lista caso perten ̧ca a ela
+//Retira um no da lista em uma posicao
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista , pos valido
+//Pos-condicao: no retirado da lista
 void retira(FILE *arq, int pos);
-
-void procura_no(FILE *arq, int codigo);
 
 #endif

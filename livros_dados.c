@@ -30,18 +30,12 @@ typedef struct
     int prox;
 } No_livro;
 
-//Escreve no arquivo o cabe ̧calho contendo as informa ̧c~oes da lista
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-//P ́os-condi ̧c~ao: cabe ̧calho escrito no arquivo
 void escreve_cabecalho_livro(FILE *arq, Cabecalho_livros_dados *cab)
 {
     fseek(arq, 0, SEEK_SET); //posiciona no in ́ıcio do arquivo
     fwrite(cab, sizeof(Cabecalho_livros_dados), 1, arq);
 }
 
-//Cria uma lista nova em arquivo
-//Pr ́e-condi ̧c~ao: arquivo aberto para leitura/escrita
-//P ́os-condi ̧c~ao: arquivo  ́e inicializado com uma lista vazia
 void cria_lista_vazia(FILE *arq)
 {
     Cabecalho_livros_dados *cab = (Cabecalho_livros_dados *)malloc(sizeof(Cabecalho_livros_dados));
@@ -52,9 +46,6 @@ void cria_lista_vazia(FILE *arq)
     free(cab);
 }
 
-//L^e o cabe ̧calho do arquivo contendo as informa ̧c~oes da lista
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-//P ́os-condi ̧c~ao: retorna o ponteiro para o cabe ̧calho lido
 Cabecalho_livros_dados *le_cabecalho_livro(FILE *arq)
 {
     Cabecalho_livros_dados *cab = (Cabecalho_livros_dados *)malloc(sizeof(Cabecalho_livros_dados));
@@ -63,10 +54,6 @@ Cabecalho_livros_dados *le_cabecalho_livro(FILE *arq)
     return cab;
 }
 
-//l^e um n ́o em uma determinada posi ̧c~ao do arquivo
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-// pos deve ser uma posi ̧c~ao v ́alida da lista
-//P ́os-condi ̧c~ao: ponteiro para n ́o lido  ́e retornado
 No_livro *le_no_livro(FILE *arq, int pos)
 {
     No_livro *x = malloc(sizeof(No_livro));
@@ -75,10 +62,6 @@ No_livro *le_no_livro(FILE *arq, int pos)
     return x;
 }
 
-//Escreve um n ́o em uma determinada posi ̧c~ao do arquivo
-//Pr ́e-condi ̧c~ao: arquivo deve estar aberto e ser um arquivo de lista
-// pos deve ser uma posi ̧c~ao v ́alida do arquivo
-//P ́os-condi ̧c~ao: n ́o escrito no arquivo
 void escreve_livro_no(FILE *arq, No_livro *x, int pos)
 {
     fseek(arq, sizeof(Cabecalho_livros_dados) + pos * sizeof(No_livro), SEEK_SET);
@@ -96,7 +79,6 @@ int insere_livro(FILE *arq, Dados_Livro livro)
 
     if (cab->pos_livre == -1)
     { // n~ao h ́a n ́os livres, ent~ao usar o topo
-        printf("colocabdo ant = %d , prox = %d\n", x.ant, x.prox);
         escreve_livro_no(arq, &x, cab->pos_topo);
 
         No_livro *ant = le_no_livro(arq, x.ant);
@@ -146,9 +128,6 @@ void imprime_livro(int pos)
     printf("\nCodigo:  %d , Autor: %s , Titulo: %s , Exemplares: %d \n", x->livro.codigo, x->livro.autor, x->livro.titulo, x->livro.exemplares);
 }
 
-//Retira um n ́o da lista
-//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
-//Pos-condicao: no retirado da lista caso pertenca a ela
 void retira(FILE *arq, int pos)
 {
 
@@ -200,35 +179,6 @@ void retira(FILE *arq, int pos)
     escreve_livro_no(arq, aux, pos);
     escreve_cabecalho_livro(arq, cab);
     free(aux);
-
-    free(cab);
-}
-
-void procura_no(FILE *arq, int codigo)
-{
-
-    Cabecalho_livros_dados *cab = le_cabecalho_livro(arq);
-    int pos_aux = cab->pos_cabeca;
-    int pos_ant = cab->pos_cabeca;
-    No_livro *aux = NULL;
-    while (pos_aux != -1 && /* procura o elemento a ser pesquisado */ ((aux = le_no_livro(arq, pos_aux)) != NULL) && aux->livro.codigo != codigo)
-    {
-        pos_ant = pos_aux;
-        pos_aux = aux->prox;
-        free(aux);
-        aux = NULL;
-    }
-
-    if (pos_aux != -1)
-    { //encontrou o elemento
-        aux = le_no_livro(arq, pos_aux);
-
-        printf("\nCodigo = %d , Autor = %s , Titulo = %s , Exemplares = %d\n", aux->livro.codigo, aux->livro.autor, aux->livro.titulo, aux->livro.exemplares);
-    }
-    else
-    {
-        printf("\nLivro nao encontrado \n");
-    }
 
     free(cab);
 }

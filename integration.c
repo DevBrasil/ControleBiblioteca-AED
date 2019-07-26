@@ -23,6 +23,8 @@ void adiciona_livro(Dados_Livro livro)
 
 void adiciona_livro_entradas()
 {
+  printf("\n \t Adicionar Livro\n\n");
+
   FILE *arquivo_codigo;
   arquivo_codigo = fopen("bdcodigos.bin", "rb+");
 
@@ -81,29 +83,39 @@ void exclui_livro(int codigo)
 
 void exclui_livro_entradas()
 {
+  printf("\n \t Excluir Livro\n\n");
+
   FILE *arquivo_codigo;
   arquivo_codigo = fopen("bdcodigos.bin", "rb+");
 
   Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
   cab = le_cabecalho_codigos(arquivo_codigo);
 
-  int aux = 1;
-  Codigo aux_codigo;
-
-  printf("\nInsira um codigo: ");
-  scanf("%d", &aux_codigo);
-
-  aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
-  while (aux == 0)
+  if (cab->pos_raiz == -1)
   {
-    printf("\nInsira um codigo existente: ");
-    scanf("%d", &aux_codigo);
-    aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
+    printf("Nao existem livros cadastrados \n");
+    fclose(arquivo_codigo);
   }
+  else
+  {
+    int aux = 1;
+    Codigo aux_codigo;
+    printf("\nInsira o codigo: ");
+    scanf("%d", &aux_codigo);
 
-  fclose(arquivo_codigo);
+    aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
+    if (aux == 0)
+    {
+      printf("Livro nao existente no sistema\n");
+      fclose(arquivo_codigo);
+    }
+    else
+    {
+      fclose(arquivo_codigo);
 
-  exclui_livro(aux_codigo);
+      exclui_livro(aux_codigo);
+    }
+  }
 }
 
 void imprime_em_ordem_de_codigo(FILE *arq, int pos)
@@ -125,68 +137,92 @@ void imprime_em_ordem_de_codigo(FILE *arq, int pos)
 
 void atualizar_exmplares()
 {
+  printf("\n \t Atualizar exemplares \n\n");
+
   FILE *arquivo_codigo;
   arquivo_codigo = fopen("bdcodigos.bin", "rb+");
 
   Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
   cab = le_cabecalho_codigos(arquivo_codigo);
 
-  int aux = 1;
-  Codigo aux_codigo;
-
-  printf("\nInsira um codigo: ");
-  scanf("%d", &aux_codigo);
-
-  aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
-  while (aux == 0)
+  if (cab->pos_raiz == -1)
   {
-    printf("\nInsira um codigo existente: ");
+    printf("Nao existem livros cadastrados \n");
+  }
+  else
+  {
+    int aux = 1;
+    Codigo aux_codigo;
+
+    printf("\nInsira um codigo: ");
     scanf("%d", &aux_codigo);
+
     aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
+    if (aux == 0)
+    {
+      printf("Livro nao existente no sistema\n");
+    }
+    else
+    {
+      int posicao = posicao_do_livro(arquivo_codigo, cab->pos_raiz, aux_codigo);
+
+      FILE *teste2;
+      teste2 = fopen("bd.bin", "rb+");
+      imprime_livro(posicao);
+      No_livro *livro = (No_livro *)malloc(sizeof(No_livro));
+      livro = le_no_livro(teste2, posicao);
+
+      printf("\nInsira a nova quantidade de exemplares do livro: ");
+      scanf("%d", &livro->livro.exemplares);
+
+      escreve_livro_no(teste2, livro, posicao);
+
+      fclose(teste2);
+    }
   }
 
-  int posicao = posicao_do_livro(arquivo_codigo, cab->pos_raiz, aux_codigo);
-
-  FILE *teste2;
-  teste2 = fopen("bd.bin", "rb+");
-  imprime_livro(posicao);
-  No_livro *livro = (No_livro *)malloc(sizeof(No_livro));
-  livro = le_no_livro(teste2, posicao);
-
-  printf("\nInsira a nova quantidade de exemplares do livro: ");
-  scanf("%d", &livro->livro.exemplares);
-
-  escreve_livro_no(teste2, livro, posicao);
-
-  fclose(teste2);
+  fclose(arquivo_codigo);
 }
 
 void buscar_dados_do_livro()
 {
+  printf("\n \t Buscar dados do Livro\n\n");
+
   FILE *arquivo_codigo;
   arquivo_codigo = fopen("bdcodigos.bin", "rb+");
 
   Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
   cab = le_cabecalho_codigos(arquivo_codigo);
 
-  int aux = 1;
-  Codigo aux_codigo;
-
-  printf("\nInsira um codigo: ");
-  scanf("%d", &aux_codigo);
-
-  aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
-  while (aux == 0)
+  if (cab->pos_raiz == -1)
   {
-    printf("\nInsira um codigo existente: ");
+    printf("Nao existem livros cadastrados \n");
+  }
+  else
+  {
+
+    int aux = 1;
+    Codigo aux_codigo;
+
+    printf("\nInsira um codigo: ");
     scanf("%d", &aux_codigo);
+
     aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz); //Insere o codigo dos livros
+
+    if (aux == 0)
+    {
+      printf("Livro nao existente no sistema\n");
+    }
+    else
+    {
+      int posicao = posicao_do_livro(arquivo_codigo, cab->pos_raiz, aux_codigo);
+
+      FILE *teste2;
+      teste2 = fopen("bd.bin", "rb+");
+      imprime_livro(posicao);
+      fclose(teste2);
+    }
   }
 
-  int posicao = posicao_do_livro(arquivo_codigo, cab->pos_raiz, aux_codigo);
-
-  FILE *teste2;
-  teste2 = fopen("bd.bin", "rb+");
-  imprime_livro(posicao);
-  fclose(teste2);
+  fclose(arquivo_codigo);
 }
