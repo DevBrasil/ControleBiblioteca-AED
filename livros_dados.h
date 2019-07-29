@@ -43,6 +43,17 @@ Cabecalho_livros_dados *le_cabecalho_livro(FILE *arq);
 //Pos-condicao: ponteiro para no lido  ́e retornado
 No_livro *le_no_livro(FILE *arq, int pos);
 
+//Insere os dados do livro no arquivo
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de dados
+//Pos-condicao: dados inseridos no arquivo.
+//Retorno: Posicao do livro do arquivo binario.
+int insere_livro(FILE *arq, Dados_Livro livro);
+
+//Mostra dados de um livro enviando sua posicao
+//Pre-condicao: nenhuma
+//Pos-condicao: nenhuma
+void imprime_livro(int pos);
+
 //Escreve um no em uma determinada posicao do arquivo
 //Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
 // pos deve ser uma posicao valida do arquivo

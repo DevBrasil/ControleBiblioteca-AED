@@ -25,7 +25,7 @@ void menu_start()
   {
 
     printf("----------------------------------------------");
-    printf("\n\t\MENU\n");
+    printf("\n\tMENU\n");
     printf("1. Carregar arquivo de inicializacao:\n");
     printf("2. Inserir livro\n");
     printf("3. Atualizar numero de exemplares de um livro\n");

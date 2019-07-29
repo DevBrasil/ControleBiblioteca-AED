@@ -211,6 +211,7 @@ int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
         printf("Codigo ja existente");
         return 0;
     }
+    return 1; //Adicionado para remocao do erro do terminal funcao deve retornar algo
 }
 
 int insere_codigo(FILE *arq, Codigo info)
