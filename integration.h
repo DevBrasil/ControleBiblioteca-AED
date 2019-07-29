@@ -36,4 +36,11 @@ void atualizar_exmplares();
 //Pos-condicao: Mostra na tela as informacoes do livro
 void buscar_dados_do_livro();
 
+//INSERIR DADOS NO SISTEMA VIA ARQUIVO TXT
+//ENTRADA: NENHUMA
+//RETORNO: NENHUM
+//PRE-CONDICAO: NENHUMA
+//POS-CONDICAO: NEHUMA
+void inserir_via_arquivo_txt();
+
 #endif

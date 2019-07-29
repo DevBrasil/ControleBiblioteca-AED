@@ -46,6 +46,7 @@ void menu_start()
 
     case 1:
       ClearTerminal();
+      inserir_via_arquivo_txt();
       printf("Opcao 1\n");
       break;
     case 2:

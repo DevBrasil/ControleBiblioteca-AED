@@ -48,10 +48,10 @@ void adiciona_livro_entradas()
   }
 
   livro.codigo = aux_codigo;
-  __fpurge(stdin);
+  //__fpurge(stdin);
   printf("\nInsira um titulo: ");
   scanf("%[^\n]", livro.titulo);
-  __fpurge(stdin);
+  //__fpurge(stdin);
   printf("\nInsira um autor: ");
   scanf("%[^\n]", livro.autor);
   printf("\nInsira o numero de exemplares: ");
@@ -225,4 +225,33 @@ void buscar_dados_do_livro()
   }
 
   fclose(arquivo_codigo);
+}
+
+void inserir_via_arquivo_txt()
+{
+
+  Dados_Livro livro; 
+
+    FILE *file;
+    file = fopen("dados.txt", "r");
+
+    char type;
+    if (file == NULL){
+        printf("Problemas na CRIACAO do arquivo\n");
+        
+    }else{
+        printf("ARQUIVO ABERTO COM SUCESSO LEITURA SENDO FEITA ...\n");
+        while(!feof(file)){
+            fscanf(file,"%d%*c",&livro.codigo);
+                fscanf(file,"%[^;]%*c",livro.titulo);
+                fscanf(file,"%[^;]%*c",livro.autor);
+                fscanf(file,"%d%*c",&livro.exemplares);
+                adiciona_livro(livro);  
+            }
+        }
+        printf("LEITURA FEITA COM SUCESSO\n");
+    
+    
+    fclose(file);
+
 }
