@@ -144,7 +144,7 @@ int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
         else
         { //nao tem filho a direita
             if (cab->pos_livre != -1)
-            {                                                 //adicionar na posicao livre
+            { //adicionar na posicao livre
 
                 printf("boceta\n");
                 exit(1);
@@ -226,8 +226,8 @@ int insere_codigo(FILE *arq, Codigo info)
         x.direita = -1;
         x.esquerda = -1;
         escreve_no_codigo(arq, &x, 0);
-        cab->pos_raiz =0;
-        cab->pos_topo ++;
+        cab->pos_raiz = 0;
+        cab->pos_topo++;
 
         escreve_cabecalho_codigo(arq, cab);
         return 1;
@@ -352,16 +352,14 @@ int excluir_codigo(FILE *arq, int pos, Codigo codigo)
             Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
             cab = le_cabecalho_codigos(arq);
 
-           
-                no->esquerda = -1;
-                no->pos_livro = -1;
-                no->direita = -1;
+            no->esquerda = -1;
+            no->pos_livro = -1;
+            no->direita = -1;
 
-                no->info = cab->pos_livre;
-                cab->pos_livre = pos;
-                escreve_cabecalho_codigo(arq, cab);
-                escreve_no_codigo(arq, no, pos);
-            
+            no->info = cab->pos_livre;
+            cab->pos_livre = pos;
+            escreve_cabecalho_codigo(arq, cab);
+            escreve_no_codigo(arq, no, pos);
 
             return -1;
         }
@@ -473,3 +471,30 @@ int existe_codigo(FILE *arq, int codigo, int pos)
 
     return 0;
 }
+
+int qtdLivros(FILE *arq, int pos)
+{
+
+    No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+    aux = le_no_codigo(arq, pos);
+
+    if (aux->esquerda == -1 && aux->direita == -1)
+    { //no folha
+        return 1;
+    }
+
+    if (aux->direita == -1 && aux->esquerda != -1)
+    {
+        return qtdLivros(arq, aux->esquerda) + 1;
+    }
+    if (aux->direita != -1 && aux->esquerda == -1)
+    {
+        return qtdLivros(arq, aux->direita) + 1;
+    }
+    if (aux->direita != -1 && aux->esquerda != -1)
+    {
+        return qtdLivros(arq, aux->esquerda) + qtdLivros(arq, aux->direita) + 1;
+    }
+}
+
+

@@ -82,6 +82,11 @@ void menu_start()
       break;
     case 8:
       ClearTerminal();
+      FILE *arq8 = fopen("bdcodigos.bin", "rb+");
+      Cabecalho_Codigo *cab2 = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+      cab2 = le_cabecalho_codigos(arq8);
+
+      printf("%d\n", qtdLivros(arq8, cab2->pos_raiz, 0));
       printf("Opcao 8\n");
       break;
     case 9:

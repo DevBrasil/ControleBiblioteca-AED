@@ -120,4 +120,9 @@ void printa_arvore_por_nivel();
 //Pos-condicao: retorna se o codigo existe na arvore
 int existe_codigo(FILE *arq, int codigo, int pos);
 
+//Percorre a árvore e devolve o total de livros presente na estrutura
+//Pre-condição: arquivo deve estar aberto e pos deve ser diferente de -1
+//Pos-condição: retorna a quantidade de livros
+int qtdLivros(FILE *arq, int pos, int qtd);
+
 #endif
