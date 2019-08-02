@@ -497,25 +497,56 @@ int qtdLivros(FILE *arq, int pos)
     }
 }
 
+int mudar( FILE *arq, int pos,int  i, Dados_Livro v[]){
+    No_Codigo * aux = (No_Codigo *) malloc(sizeof(No_Codigo));
+    aux = le_no_codigo(arq, pos);
+
+    if(aux->esquerda != -1){ //filho a esquerda
+        i = mudar(arq, aux->esquerda, i, v);
+    }
+
+    FILE *x = fopen("bd.bin", "rb+");
+    No_livro *a = le_no_livro(x, aux->pos_livro);
+i++;
+    v[i] = a->livro;
+    
+
+    fclose(x);
+
+    if(aux->direita != -1){ //filho a direita
+        i = mudar(arq, aux->direita, i, v);
+    }
+
+return i;
+}
+
 void gerarListagemporTitulo(){
-    printf("entrou aqui\n");
 
     //Abertura de Arquivo e Contabilização do Vetor
     FILE *x = fopen("bdcodigos.bin", "rb+");
     Cabecalho_Codigo *cab2 = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     cab2 = le_cabecalho_codigos(x);
 
-    //Tamanho do vetor definido pela função qtdLivros
-    int n = qtdLivros(x, cab2->pos_raiz);
+    if(cab2->pos_raiz != -1){//Tamanho do vetor definido pela função qtdLivros
+        int n = qtdLivros(x, cab2->pos_raiz);
 
-    printf("n vale = %d\n", n);
+        printf("n vale = %d\n", n);
 
-    //Alocando vetor dinâmicamente conforme o tanto de livros cadastrados no sistema
-    Dados_Livro *v = (Dados_Livro *)malloc(n * sizeof(Dados_Livro));
+        //Alocando vetor dinâmicamente conforme o tanto de livros cadastrados no sistema
 
-    int i = 0;
-    while (fread(&x, sizeof(No_Codigo), 1, x)){
+    
 
+        Dados_Livro *v = (Dados_Livro *)malloc(n * sizeof(Dados_Livro));
+
+        mudar(x, cab2->pos_raiz, 0, v);
+
+
+        for(int asdf=0; asdf<n; asdf++){
+            printf("%s\n", v[asdf].titulo);
+        }
+    }
+    else{
+        printf("Nenhum livro cadastrado\n");
     }
     
     //Efetuando Quicksort no vetor
