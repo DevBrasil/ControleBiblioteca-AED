@@ -1,5 +1,6 @@
 #ifndef LIVRO_CODIGO
 #define LIVRO_CODIGO
+#include <stdio.h>
 
 typedef int Codigo;
 
@@ -124,5 +125,10 @@ int existe_codigo(FILE *arq, int codigo, int pos);
 //Pre-condição: arquivo deve estar aberto e pos deve ser diferente de -1
 //Pos-condição: retorna a quantidade de livros
 int qtdLivros(FILE *arq, int pos, int qtd);
+
+//Gera um arquivo com toda as informações dos livros separados por ordem alfabética
+//Pre-condição: arquivo deve estar aberto
+//Pos-condição: nenhuma
+void gerarListagemporTitulo();
 
 #endif

@@ -497,4 +497,26 @@ int qtdLivros(FILE *arq, int pos)
     }
 }
 
+void gerarListagemporTitulo(){
+    printf("entrou aqui\n");
 
+    //Abertura de Arquivo e Contabilização do Vetor
+    FILE *x = fopen("bdcodigos.bin", "rb+");
+    Cabecalho_Codigo *cab2 = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+    cab2 = le_cabecalho_codigos(x);
+
+    //Tamanho do vetor definido pela função qtdLivros
+    int n = qtdLivros(x, cab2->pos_raiz);
+
+    printf("n vale = %d\n", n);
+
+    //Alocando vetor dinâmicamente conforme o tanto de livros cadastrados no sistema
+    Dados_Livro *v = (Dados_Livro *)malloc(n * sizeof(Dados_Livro));
+
+    int i = 0;
+    while (fread(&x, sizeof(No_Codigo), 1, x)){
+
+    }
+    
+    //Efetuando Quicksort no vetor
+}

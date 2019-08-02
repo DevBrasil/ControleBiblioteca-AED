@@ -88,6 +88,8 @@ void menu_start()
 
       printf("%d\n", qtdLivros(arq8, cab2->pos_raiz, 0));
       printf("Opcao 8\n");
+
+      gerarListagemporTitulo();
       break;
     case 9:
       ClearTerminal();
