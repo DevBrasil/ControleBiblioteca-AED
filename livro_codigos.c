@@ -520,6 +520,38 @@ i++;
 return i;
 }
 
+int particiona(Dados_Livro V[], int inicio, int final){
+    int esq, dir; char pivoC[10], aux[10];
+    esq = inicio;
+    dir = final;
+    strcpy(pivoC, V[inicio].titulo);
+
+    while(esq < dir){
+        while(strcmp(V[esq].titulo, pivoC)<=0)
+            esq++;
+        while(strcmp(V[dir].titulo, pivoC)>0)
+            dir--;
+        if(esq < dir){
+            strcpy(aux, V[esq].titulo);
+            strcpy(V[esq].titulo, V[dir].titulo);
+            strcpy(V[dir].titulo, aux);
+        }
+    }
+    strcpy(V[inicio].titulo, V[dir].titulo);
+    strcpy(V[dir].titulo, pivoC);
+
+    return dir;
+}
+
+void QuickSort(Dados_Livro V[], int inicio, int fim){
+    int pivo;
+    if(fim > inicio){
+        pivo = particiona(V, inicio, fim);
+        QuickSort(V, inicio, pivo-1);
+        QuickSort(V, pivo+1, fim);
+    }
+}
+
 void gerarListagemporTitulo(){
 
     //Abertura de Arquivo e Contabilização do Vetor
@@ -533,21 +565,19 @@ void gerarListagemporTitulo(){
         printf("n vale = %d\n", n);
 
         //Alocando vetor dinâmicamente conforme o tanto de livros cadastrados no sistema
-
-    
-
         Dados_Livro *v = (Dados_Livro *)malloc(n * sizeof(Dados_Livro));
 
         mudar(x, cab2->pos_raiz, 0, v);
 
-
+        //Efetuando Quicksort no vetor
+        QuickSort(v, 0, n);
+        
         for(int asdf=0; asdf<n; asdf++){
-            printf("%s\n", v[asdf].titulo);
+            printf("[%d] = %s - Codigo: %d\n", asdf, v[asdf].titulo, v[asdf].codigo);
         }
     }
     else{
         printf("Nenhum livro cadastrado\n");
+        return;
     }
-    
-    //Efetuando Quicksort no vetor
 }
