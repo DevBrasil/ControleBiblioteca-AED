@@ -525,6 +525,7 @@ int particiona(Dados_Livro V[], int inicio, int final){
     esq = inicio;
     dir = final;
     strcpy(pivoC, V[inicio].titulo);
+    printf("Entrou aqui\n");
 
     while(esq < dir){
         while(strcmp(V[esq].titulo, pivoC)<=0)
@@ -539,6 +540,7 @@ int particiona(Dados_Livro V[], int inicio, int final){
     }
     strcpy(V[inicio].titulo, V[dir].titulo);
     strcpy(V[dir].titulo, pivoC);
+    printf("Entrou aqui2\n");
 
     return dir;
 }
@@ -569,8 +571,22 @@ void gerarListagemporTitulo(){
 
         mudar(x, cab2->pos_raiz, 0, v);
 
+        for(int asdf=0; asdf<n; asdf++){
+            printf("[%d] = %s - Codigo: %d\n", asdf, v[asdf].titulo, v[asdf].codigo);
+        }
+
+        printf("Entrando no Quicksort\n");
         //Efetuando Quicksort no vetor
         QuickSort(v, 0, n);
+
+        FILE *h = fopen("Catalago de Livros.txt", "a");
+
+        fprintf(h, "Código\tTítulo\tAutor\tQtd. Exemplares\n");
+        for(int i=0; i<n;i++){
+            fprintf(h, "%d\t %s\t %s\t----%d\n", v[i].codigo, v[i].titulo, v[i].autor, v[i].exemplares);
+        }
+
+        fclose(h);
         
         for(int asdf=0; asdf<n; asdf++){
             printf("[%d] = %s - Codigo: %d\n", asdf, v[asdf].titulo, v[asdf].codigo);
