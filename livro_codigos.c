@@ -485,3 +485,105 @@ int qtdLivros(FILE *arq, int pos)
         return qtdLivros(arq, aux->esquerda) + qtdLivros(arq, aux->direita) + 1;
     }
 }
+
+
+int mudar( FILE *arq, int pos,int  i, Dados_Livro v[]){
+    No_Codigo * aux = (No_Codigo *) malloc(sizeof(No_Codigo));
+    aux = le_no_codigo(arq, pos);
+
+    if(aux->esquerda != -1){ //filho a esquerda
+        i = mudar(arq, aux->esquerda, i, v);
+    }
+
+    FILE *x = fopen("bd.bin", "rb+");
+    No_livro *a = le_no_livro(x, aux->pos_livro);
+i++;
+    v[i] = a->livro;
+    
+
+    fclose(x);
+
+    if(aux->direita != -1){ //filho a direita
+        i = mudar(arq, aux->direita, i, v);
+    }
+
+return i;
+}
+
+int particiona(Dados_Livro V[], int inicio, int final){
+    int esq, dir; char pivoC[10], aux[10];
+    esq = inicio;
+    dir = final;
+    strcpy(pivoC, V[inicio].titulo);
+    printf("Entrou aqui\n");
+
+    while(esq < dir){
+        while(strcmp(V[esq].titulo, pivoC)<=0)
+            esq++;
+        while(strcmp(V[dir].titulo, pivoC)>0)
+            dir--;
+        if(esq < dir){
+            strcpy(aux, V[esq].titulo);
+            strcpy(V[esq].titulo, V[dir].titulo);
+            strcpy(V[dir].titulo, aux);
+        }
+    }
+    strcpy(V[inicio].titulo, V[dir].titulo);
+    strcpy(V[dir].titulo, pivoC);
+    printf("Entrou aqui2\n");
+
+    return dir;
+}
+
+void QuickSort(Dados_Livro V[], int inicio, int fim){
+    int pivo;
+    if(fim > inicio){
+        pivo = particiona(V, inicio, fim);
+        QuickSort(V, inicio, pivo-1);
+        QuickSort(V, pivo+1, fim);
+    }
+}
+
+void gerarListagemporTitulo(){
+
+    //Abertura de Arquivo e Contabilização do Vetor
+    FILE *x = fopen("bdcodigos.bin", "rb+");
+    Cabecalho_Codigo *cab2 = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+    cab2 = le_cabecalho_codigos(x);
+
+    if(cab2->pos_raiz != -1){//Tamanho do vetor definido pela função qtdLivros
+        int n = qtdLivros(x, cab2->pos_raiz);
+
+        printf("n vale = %d\n", n);
+
+        //Alocando vetor dinâmicamente conforme o tanto de livros cadastrados no sistema
+        Dados_Livro *v = (Dados_Livro *)malloc(n * sizeof(Dados_Livro));
+
+        mudar(x, cab2->pos_raiz, 0, v);
+
+        for(int asdf=0; asdf<n; asdf++){
+            printf("[%d] = %s - Codigo: %d\n", asdf, v[asdf].titulo, v[asdf].codigo);
+        }
+
+        printf("Entrando no Quicksort\n");
+        //Efetuando Quicksort no vetor
+        QuickSort(v, 0, n);
+
+        FILE *h = fopen("Catalago de Livros.txt", "a");
+
+        fprintf(h, "Código\tTítulo\tAutor\tQtd. Exemplares\n");
+        for(int i=0; i<n;i++){
+            fprintf(h, "%d\t %s\t %s\t----%d\n", v[i].codigo, v[i].titulo, v[i].autor, v[i].exemplares);
+        }
+
+        fclose(h);
+        
+        for(int asdf=0; asdf<n; asdf++){
+            printf("[%d] = %s - Codigo: %d\n", asdf, v[asdf].titulo, v[asdf].codigo);
+        }
+    }
+    else{
+        printf("Nenhum livro cadastrado\n");
+        return;
+    }
+}

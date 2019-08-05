@@ -78,10 +78,7 @@ void menu_start()
       break;
     case 9:
       ClearTerminal();
-      FILE *arq9 = fopen("bdcodigos.bin", "rb+");
-
-      imprimi_lista_codigo(arq9);
-      fclose(arq9);
+      gerarListagemporTitulo();
       break;
     case 0:
       ClearTerminal();
