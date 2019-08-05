@@ -158,7 +158,7 @@ int adiciona_codigo_no_bd_codigos(FILE *arq, int pos, Codigo info)
         }
 
         escreve_cabecalho_codigo(arq, cab);
-        printf("raiz %d , topo %d , livre %d \n", cab->pos_raiz, cab->pos_topo, cab->pos_livre);
+        //printf("raiz %d , topo %d , livre %d \n", cab->pos_raiz, cab->pos_topo, cab->pos_livre);
         free(cab);
     }
     else
@@ -263,7 +263,7 @@ void imprimi_lista_codigo()
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     cab = le_cabecalho_codigos(arq);
 
-    printf("Raiz %d  Topo %d Livre %d\n", cab->pos_raiz, cab->pos_topo, cab->pos_livre);
+   // printf("Raiz %d  Topo %d Livre %d\n", cab->pos_raiz, cab->pos_topo, cab->pos_livre);
     int i = 0;
     while (fread(&x, sizeof(No_Codigo), 1, arq))
     {
@@ -546,7 +546,6 @@ int particiona(Dados_Livro V[], int inicio, int final)
     Dados_Livro pivo = V[inicio];
     Dados_Livro aux;
 
-    printf("Entrou aqui\n");
 
     while (esq < dir)
     {
@@ -591,17 +590,13 @@ void gerarListagemporTitulo()
     { //Tamanho do vetor definido pela função qtdLivros
         int n = qtdLivros(x, cab2->pos_raiz);
 
-        printf("n vale = %d\n", n);
 
         //Alocando vetor dinâmicamente conforme o tanto de livros cadastrados no sistema
         Dados_Livro *v = (Dados_Livro *)malloc(n * sizeof(Dados_Livro));
 
         mudar(x, cab2->pos_raiz, -1, v);
 
-        for (int p = 0; p < n; p++)
-        {
-            printf("[%d] = %s - Codigo: %d\n", p, v[p].titulo, v[p].codigo);
-        }
+        
 
         //Efetuando Quicksort no vetor
         QuickSort(v, 0, n-1);

@@ -1,2 +1,9 @@
 Código 	Título 	Autor 	Qtd. Exemplares
-1	 	 	----0
+4	 AAAA	  Bjarne Stroustrup	----3
+5	 BBBB	  W. Clocksin	----2
+3	 CCCC	 Yuval Harari	----11
+6	 DDDD	  Joao Guimaraes Rosa	----4
+2	 PPPP	  Marion Zimmer Bradley	----2
+7	 TTTT	  Rachel de Queiroz	----5
+8	 YYYY	 Joaquim Maria Machado de Assis	----7
+1	 ZZZZ	  J. R. R. Tolkien	----5

@@ -5,6 +5,22 @@
 #include "livro_codigos.h"
 #include "livros_dados.h"
 
+
+char *remover_espacos_frase(char *s)
+{
+    int n = 0;
+    while (n < strlen(s)) {
+        if ((s[n] == ' ') && (s[n-1] == ' ')) {
+                  while (s[n] == ' ') {
+                        s[n] = '\a';
+                        n++;
+                  }
+        }
+        n++;
+    }
+    return s;
+}
+
 void adiciona_livro(Dados_Livro livro)
 {
 
@@ -39,19 +55,20 @@ void adiciona_livro_entradas()
 
   while (aux == 1)
   {
-    aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz);
-    printf("\nInsira um codigo nao existente: ");
+    printf("\nCodigo existente!!");
+    printf("\nInsira um codigo novamente: ");
     scanf("%d", &aux_codigo);
+    aux = existe_codigo(arquivo_codigo, aux_codigo, cab->pos_raiz);
   }
-
   livro.codigo = aux_codigo;
 
   printf("\nInsira um titulo: ");
-  scanf("%[^\n]", livro.titulo);
-  __fpurge(stdin);
+  scanf("%*c%[^\n]%*c", livro.titulo);
+  
   printf("\nInsira um autor: ");
   scanf("%[^\n]", livro.autor);
-  __fpurge(stdin);
+  //printf("Livro titulo: %s\n",remover_espacos_frase(livro.titulo));
+  
 
   printf("\nInsira o numero de exemplares: ");
   scanf("%d", &livro.exemplares);
@@ -59,6 +76,7 @@ void adiciona_livro_entradas()
   fclose(arquivo_codigo);
 
   adiciona_livro(livro);
+  printf("Livro cadastrado com sucesso!\n");
 }
 
 void exclui_livro()
@@ -83,6 +101,7 @@ void exclui_livro()
 
     FILE *arquivo_dados = fopen("bd.bin", "rb+");
     retira(arquivo_dados, posicao);
+    printf("Removido com sucesso!!\n ");
     fclose(arquivo_dados);
   }
   else
@@ -90,6 +109,7 @@ void exclui_livro()
     printf("\nlivro nao existente\n");
     fclose(arquivo_codigo);
   }
+
 
   free(cab);
 }
@@ -237,7 +257,7 @@ void inserir_via_arquivo_txt()
   char type;
   if (file == NULL)
   {
-    printf("Problemas na CRIACAO do arquivo\n");
+    printf("Problemas na LEITURA do arquivo\n");
   }
   else
   {
@@ -248,6 +268,8 @@ void inserir_via_arquivo_txt()
       fscanf(file, "%[^;]%*c", livro.titulo);
       fscanf(file, "%[^;]%*c", livro.autor);
       fscanf(file, "%d%*c", &livro.exemplares);
+      *livro.autor = *remover_espacos_frase(livro.autor);
+      *livro.titulo = *remover_espacos_frase(livro.titulo);
       adiciona_livro(livro);
     }
   }

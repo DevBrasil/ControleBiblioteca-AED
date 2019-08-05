@@ -1,6 +1,12 @@
 #ifndef INTEGRATION
 #define INTEGRATION
 
+//Remove espaços desnecessarios nas frases
+//Pre-condicao: Deve ser uma string
+//Pos-condicao: nenhum
+//Retorno: Frase sem espacos desnecessarios
+char *remover_espacos_frase(char s[]);
+
 //Insere um livro no arquivo de codigos e no de dados
 //Pre-condicao: livro nao pode ser null e nao pode existir nos arquivo
 //Pos-condicao: livro adicionado nos arquivos

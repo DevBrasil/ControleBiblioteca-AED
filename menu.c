@@ -60,6 +60,7 @@ void menu_start()
     case 4:
       ClearTerminal();
       exclui_livro();
+     
       break;
     case 5:
       ClearTerminal();

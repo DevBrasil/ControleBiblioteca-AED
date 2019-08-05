@@ -1,8 +1,8 @@
-1;ZZZZ; J. R. R. Tolkien;5
-2;PPPP; Marion Zimmer Bradley;2
-3;CCCC;Yuval Harari;11
-4;AAAA; Bjarne Stroustrup;3
-5;BBBB; W. Clocksin;2
-6;DDDD; Joao Guimaraes Rosa;4
-7;TTTT; Rachel de Queiroz;5
-8;YYYY;Joaquim Maria Machado de Assis;7
+1;ZZZ   Z; J.       R. R. Tolkien            ;5
+2;PPP  P; Marion Zimmer Brad         ley;2
+3;CC   CC;Yuval Hara      ri;11
+4;AA    AA; Bjarne Stroust              rup;3
+5;BB  BB;           W. Clocksin                   ;2
+6;DD   DD;            Joao Guimaraes Rosa;4
+7;TT   TT;     Rachel de Queiroz;5
+8;YYY    Y;ffJoaquim Ma       ria Machado de Assis;7
