@@ -122,6 +122,11 @@ void printa_no(FILE *arq, int pos);
 //Pos-condicao: codigos de tal nivel mostrados na tela
 void printa_nivel(FILE *arq, int pos, int nivel, int final);
 
+//Percorre a árvore e devolve o total de livros presente na estrutura
+//Pre-condição: arquivo deve estar aberto e pos deve ser diferente de -1
+//Pos-condição: retorna a quantidade de livros
+int qtdLivros(FILE *arq, int pos, int qtd);
+
 //Printa a arvore de codigos por niveis
 //Pre-condicao: nenhuma
 //Pos-condicao: arvore printada no console por niveis
@@ -132,10 +137,7 @@ void printa_arvore_por_nivel();
 //Pos-condicao: retorna se o codigo existe na arvore
 int existe_codigo(FILE *arq, int codigo, int pos);
 
-//Percorre a árvore e devolve o total de livros presente na estrutura
-//Pre-condição: arquivo deve estar aberto e pos deve ser diferente de -1
-//Pos-condição: retorna a quantidade de livros
-int qtdLivros(FILE *arq, int pos, int qtd);
+
 
 //Gera um arquivo com toda as informações dos livros separados por ordem alfabética
 //Pre-condição: arquivo deve estar aberto

@@ -96,6 +96,7 @@ void exclui_livro()
 
 void imprime_em_ordem_de_codigo(FILE *arq, int pos)
 {
+
   No_Codigo *no = (No_Codigo *)malloc(sizeof(No_Codigo));
   no = le_no_codigo(arq, pos);
 
@@ -104,7 +105,7 @@ void imprime_em_ordem_de_codigo(FILE *arq, int pos)
     imprime_em_ordem_de_codigo(arq, no->esquerda);
   }
 
-  if (no->info != -1)
+  if (no->pos_livro != -2)
   {
     imprime_livro(no->pos_livro);
   }

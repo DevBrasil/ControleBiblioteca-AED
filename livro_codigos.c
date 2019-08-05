@@ -214,6 +214,19 @@ int maximo_codigo(FILE *arq, int pos)
         return no_aux->info;
 }
 
+int maximo_codigo_pos_livro(FILE *arq, int pos)
+{
+    No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+    no_aux = le_no_codigo(arq, pos);
+
+    if (no_aux->direita != -1)
+    {
+        return maximo_codigo(arq, no_aux->direita);
+    }
+    else
+        return no_aux->pos_livro;
+}
+
 int minimo_codigo(FILE *arq, int pos)
 {
     No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
@@ -226,6 +239,20 @@ int minimo_codigo(FILE *arq, int pos)
     else
         return no_aux->info;
 }
+int minimo_codigo_pos_livro(FILE *arq, int pos)
+{
+    No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+    no_aux = le_no_codigo(arq, pos);
+
+    if (no_aux->esquerda != -1)
+    {
+        return minimo_codigo(arq, no_aux->esquerda);
+    }
+    else
+        return no_aux->pos_livro;
+}
+
+
 
 void imprimi_lista_codigo()
 {
@@ -287,12 +314,27 @@ void imprimir_arvore_binaria_na_notacao(FILE *arq, int pos)
     }
 }
 
+int qtdLivros(FILE *arq, int pos)
+{
+    if (pos == -1)
+    {
+        return 0;
+    }
+    else
+    {
+        No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+        aux = le_no_codigo(arq, pos);
+        return qtdLivros(arq, aux->esquerda) + qtdLivros(arq, aux->direita) + 1;
+    }
+}
+
 void imprime_tudo_notacao()
 {
     FILE *arq = fopen("bdcodigos.bin", "rb+");
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     cab = le_cabecalho_codigos(arq);
     imprimir_arvore_binaria_na_notacao(arq, cab->pos_raiz);
+    printf("\n\n");
     fclose(arq);
 }
 
@@ -323,7 +365,7 @@ int excluir_codigo(FILE *arq, int pos, Codigo codigo)
 
             //limpar livro;
             aux->esquerda = -1;
-            aux->pos_livro = -1;
+            aux->pos_livro = -2;
             aux->direita = -1;
 
             //Encadear lista de posicoes livres;
@@ -340,12 +382,14 @@ int excluir_codigo(FILE *arq, int pos, Codigo codigo)
         if (aux->esquerda == -1)
         { //somente filho a direita
             aux->info = minimo_codigo(arq, aux->direita);
+            aux->pos_livro = minimo_codigo_pos_livro(arq,aux->direita);
             aux->direita = excluir_codigo(arq, aux->direita, aux->info);
             escreve_no_codigo(arq, aux, pos);
         }
         else
         { // dois filhos ou 1 a esquerda
             aux->info = maximo_codigo(arq, aux->esquerda);
+            aux->pos_livro = maximo_codigo_pos_livro(arq,aux->esquerda);
             aux->esquerda = excluir_codigo(arq, aux->esquerda, aux->info);
             escreve_no_codigo(arq, aux, pos);
         }
@@ -421,9 +465,10 @@ void printa_arvore_por_nivel()
     if (cab->pos_raiz != -1)
     {
         int qtd = qtdLivros(arquivo_codigo, cab->pos_raiz);
-        for (int i = 0; i < 999; i++)
+        for (int i = 0; i < qtd; i++)
         {
             printa_nivel(arquivo_codigo, cab->pos_raiz, 1, i);
+            printf("\n");
         }
     }
     else
@@ -461,97 +506,89 @@ int existe_codigo(FILE *arq, int codigo, int pos)
     return 0;
 }
 
-int qtdLivros(FILE *arq, int pos)
+int mudar(FILE *arq, int pos, int i, Dados_Livro v[])
 {
-
-    No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo));
-    aux = le_no_codigo(arq, pos);
-
-    if (aux->esquerda == -1 && aux->direita == -1)
-    { //no folha
-        return 1;
-    }
-
-    if (aux->direita == -1 && aux->esquerda != -1)
+    if (pos == -1)
     {
-        return qtdLivros(arq, aux->esquerda) + 1;
+        return 0;
     }
-    if (aux->direita != -1 && aux->esquerda == -1)
+    else
     {
-        return qtdLivros(arq, aux->direita) + 1;
+        No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+        aux = le_no_codigo(arq, pos);
+
+        FILE *x = fopen("bd.bin", "rb+");
+        No_livro *a = le_no_livro(x, aux->pos_livro);
+        fclose(x);
+
+        i++;
+        v[i] = a->livro;
+        if(aux->esquerda != -1){
+            i = mudar(arq, aux->esquerda, i, v);
+        }
+        
+        if(aux->direita != -1){
+            i = mudar(arq, aux->direita, i, v);
+        }
+
     }
-    if (aux->direita != -1 && aux->esquerda != -1)
-    {
-        return qtdLivros(arq, aux->esquerda) + qtdLivros(arq, aux->direita) + 1;
-    }
+
+   
+    return i;
 }
 
-
-int mudar( FILE *arq, int pos,int  i, Dados_Livro v[]){
-    No_Codigo * aux = (No_Codigo *) malloc(sizeof(No_Codigo));
-    aux = le_no_codigo(arq, pos);
-
-    if(aux->esquerda != -1){ //filho a esquerda
-        i = mudar(arq, aux->esquerda, i, v);
-    }
-
-    FILE *x = fopen("bd.bin", "rb+");
-    No_livro *a = le_no_livro(x, aux->pos_livro);
-i++;
-    v[i] = a->livro;
-    
-
-    fclose(x);
-
-    if(aux->direita != -1){ //filho a direita
-        i = mudar(arq, aux->direita, i, v);
-    }
-
-return i;
-}
-
-int particiona(Dados_Livro V[], int inicio, int final){
-    int esq, dir; char pivoC[10], aux[10];
+int particiona(Dados_Livro V[], int inicio, int final)
+{
+    int esq, dir;
     esq = inicio;
     dir = final;
-    strcpy(pivoC, V[inicio].titulo);
+
+    Dados_Livro pivo = V[inicio];
+    Dados_Livro aux;
+
     printf("Entrou aqui\n");
 
-    while(esq < dir){
-        while(strcmp(V[esq].titulo, pivoC)<=0)
+    while (esq < dir)
+    {
+        while (strcmp(V[esq].titulo, pivo.titulo) <= 0)
             esq++;
-        while(strcmp(V[dir].titulo, pivoC)>0)
+        while (strcmp(V[dir].titulo, pivo.titulo) > 0)
             dir--;
-        if(esq < dir){
-            strcpy(aux, V[esq].titulo);
-            strcpy(V[esq].titulo, V[dir].titulo);
-            strcpy(V[dir].titulo, aux);
+        if (esq < dir)
+        {
+            aux = V[esq];
+            V[esq] = V[dir];
+            V[dir] = aux;
         }
     }
-    strcpy(V[inicio].titulo, V[dir].titulo);
-    strcpy(V[dir].titulo, pivoC);
-    printf("Entrou aqui2\n");
+
+    V[inicio] = V[dir];
+    V[dir] = pivo;
 
     return dir;
 }
 
-void QuickSort(Dados_Livro V[], int inicio, int fim){
+void QuickSort(Dados_Livro V[], int inicio, int fim)
+{
     int pivo;
-    if(fim > inicio){
+    if (fim > inicio)
+    {
         pivo = particiona(V, inicio, fim);
-        QuickSort(V, inicio, pivo-1);
-        QuickSort(V, pivo+1, fim);
+        QuickSort(V, inicio, pivo - 1);
+        QuickSort(V, pivo + 1, fim);
     }
 }
 
-void gerarListagemporTitulo(){
+void gerarListagemporTitulo()
+{
 
     //Abertura de Arquivo e Contabilização do Vetor
     FILE *x = fopen("bdcodigos.bin", "rb+");
     Cabecalho_Codigo *cab2 = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     cab2 = le_cabecalho_codigos(x);
 
-    if(cab2->pos_raiz != -1){//Tamanho do vetor definido pela função qtdLivros
+    if (cab2->pos_raiz != -1)
+    { //Tamanho do vetor definido pela função qtdLivros
         int n = qtdLivros(x, cab2->pos_raiz);
 
         printf("n vale = %d\n", n);
@@ -559,31 +596,35 @@ void gerarListagemporTitulo(){
         //Alocando vetor dinâmicamente conforme o tanto de livros cadastrados no sistema
         Dados_Livro *v = (Dados_Livro *)malloc(n * sizeof(Dados_Livro));
 
-        mudar(x, cab2->pos_raiz, 0, v);
+        mudar(x, cab2->pos_raiz, -1, v);
 
-        for(int asdf=0; asdf<n; asdf++){
-            printf("[%d] = %s - Codigo: %d\n", asdf, v[asdf].titulo, v[asdf].codigo);
+        for (int p = 0; p < n; p++)
+        {
+            printf("[%d] = %s - Codigo: %d\n", p, v[p].titulo, v[p].codigo);
         }
 
-        printf("Entrando no Quicksort\n");
         //Efetuando Quicksort no vetor
-        QuickSort(v, 0, n);
+        QuickSort(v, 0, n-1);
 
-        FILE *h = fopen("Catalago de Livros.txt", "a");
+        FILE *h = fopen("Catalago de Livros.txt", "w");
 
-        fprintf(h, "Código\tTítulo\tAutor\tQtd. Exemplares\n");
-        for(int i=0; i<n;i++){
+        fprintf(h, "Código \tTítulo \tAutor \tQtd. Exemplares\n");
+        for (int i = 0; i < n; i++)
+        {
             fprintf(h, "%d\t %s\t %s\t----%d\n", v[i].codigo, v[i].titulo, v[i].autor, v[i].exemplares);
         }
 
         fclose(h);
-        
-        for(int asdf=0; asdf<n; asdf++){
+
+        for (int asdf = 0; asdf < n; asdf++)
+        {
             printf("[%d] = %s - Codigo: %d\n", asdf, v[asdf].titulo, v[asdf].codigo);
         }
     }
-    else{
+    else
+    {
         printf("Nenhum livro cadastrado\n");
-        return;
     }
+
+    fclose(x);
 }
