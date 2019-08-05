@@ -118,125 +118,87 @@ int posicao_do_livro(FILE *arq, int pos, int codigo)
     }
 }
 
-int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos)
+int adiciona_codigo_no_bd_codigos(FILE *arq, int pos, Codigo info)
 {
+    No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+
+    if (pos == -1)
+    { //Adicionar no
+        aux->direita = -1;
+        aux->esquerda = -1;
+        aux->info = info;
+        aux->pos_livro = -1;
+
+        Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+        cab = le_cabecalho_codigos(arq);
+
+        if (cab->pos_livre != -1)
+        { //adicionar no na posicao livre
+            No_Codigo *livre = (No_Codigo *)malloc(sizeof(No_Codigo));
+            livre = le_no_codigo(arq, cab->pos_livre);
+
+            //escrevendo a posicao do livro
+            pos = cab->pos_livre;
+
+            //escrevendo o livro na posicao livre
+            escreve_no_codigo(arq, aux, cab->pos_livre);
+
+            //arrumar lista de livros livres
+            cab->pos_livre = livre->info;
+
+            free(livre);
+        }
+        else
+        {
+            //escrevendo a posicao do livro
+            pos = cab->pos_topo;
+
+            escreve_no_codigo(arq, aux, cab->pos_topo);
+            cab->pos_topo++;
+        }
+
+        escreve_cabecalho_codigo(arq, cab);
+        printf("raiz %d , topo %d , livre %d \n", cab->pos_raiz, cab->pos_topo, cab->pos_livre);
+        free(cab);
+    }
+    else
+    {
+        aux = le_no_codigo(arq, pos);
+
+        if (info > aux->info)
+        { //adicionando codigo maior que o codigo atual;
+            aux->direita = adiciona_codigo_no_bd_codigos(arq, aux->direita, info);
+            escreve_no_codigo(arq, aux, pos);
+        }
+        else
+        { //adicionando codigo menor que o codigo atual;
+            aux->esquerda = adiciona_codigo_no_bd_codigos(arq, aux->esquerda, info);
+            escreve_no_codigo(arq, aux, pos);
+        }
+    }
+
+    free(aux);
+
+    return pos;
+}
+
+void insere_codigo(int info)
+{
+    FILE *arq = fopen("bdcodigos.bin", "rb+");
 
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     cab = le_cabecalho_codigos(arq);
 
-    No_Codigo *no_aux = (No_Codigo *)malloc(sizeof(No_Codigo));
-    no_aux = le_no_codigo(arq, pos);
+    //apontando raiz
+    int raiz;
+    raiz = adiciona_codigo_no_bd_codigos(arq, cab->pos_raiz, info);
 
-    printf("no = %d ,", no_aux->info);
+    cab = le_cabecalho_codigos(arq);
+    cab->pos_raiz = raiz;
 
-    No_Codigo *novo = (No_Codigo *)malloc(sizeof(No_Codigo));
-    novo->direita = -1;
-    novo->esquerda = -1;
-    novo->info = info;
+    escreve_cabecalho_codigo(arq, cab);
 
-    if (no_aux->info < info)
-    { //adição a direita
-        if (no_aux->direita != -1)
-        { //ele ja tem filho da direita
-            printf("direita ------\n");
-            adiciona_codigo_no_bd_codigos(arq, novo->info, no_aux->direita);
-        }
-        else
-        { //nao tem filho a direita
-            if (cab->pos_livre != -1)
-            { //adicionar na posicao livre
-
-                printf("boceta\n");
-                exit(1);
-
-                escreve_no_codigo(arq, novo, cab->pos_livre); // escreve o no na posicao livre
-
-                No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo)); // le a posicao livre
-                aux = le_no_codigo(arq, cab->pos_livre);
-
-                no_aux->direita = cab->pos_livre; //color o novo membro como filho da direita
-                cab->pos_livre = aux->info;       //encadear a lista de nos livres
-
-                escreve_no_codigo(arq, no_aux, pos);
-                escreve_cabecalho_codigo(arq, cab);
-            }
-            else
-            {                                                //nao tem posicao livre
-                escreve_no_codigo(arq, novo, cab->pos_topo); // escreve o no na posicao topo
-
-                no_aux->direita = cab->pos_topo; //color o novo membro como filho da direita
-                cab->pos_topo++;                 //atualizar o topo da arvore
-
-                escreve_no_codigo(arq, no_aux, pos);
-                escreve_cabecalho_codigo(arq, cab);
-            }
-        }
-    }
-    else if (no_aux->info > info)
-    { //adição a esquerda
-        if (no_aux->esquerda != -1)
-        { //ele ja tem filho da esquerda
-
-            adiciona_codigo_no_bd_codigos(arq, novo->info, no_aux->esquerda);
-        }
-        else
-        { //nao tem filho a direita
-            if (cab->pos_livre != -1)
-            {                                                 //adicionar na posicao livre
-                escreve_no_codigo(arq, novo, cab->pos_livre); // escreve o no na posicao livre
-
-                No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo)); // le a posicao livre
-                aux = le_no_codigo(arq, cab->pos_livre);
-
-                no_aux->esquerda = cab->pos_livre; //color o novo membro como filho da direita
-                cab->pos_livre = aux->info;        //encadear a lista de nos livres
-
-                escreve_no_codigo(arq, no_aux, pos);
-                escreve_cabecalho_codigo(arq, cab);
-            }
-            else
-            {                                                //nao tem posicao livre
-                escreve_no_codigo(arq, novo, cab->pos_topo); // escreve o no na posicao topo
-
-                no_aux->esquerda = cab->pos_topo; //color o novo membro como filho da direita
-                cab->pos_topo++;                  //atualizar o topo da arvore
-
-                escreve_no_codigo(arq, no_aux, pos);
-                escreve_cabecalho_codigo(arq, cab);
-            }
-        }
-    }
-    else
-    {
-        printf("Codigo ja existente");
-        return 0;
-    }
-    return 1; //Adicionado para remocao do erro do terminal funcao deve retornar algo
-}
-
-int insere_codigo(FILE *arq, Codigo info)
-{
-    Cabecalho_Codigo *cab = le_cabecalho_codigos(arq);
-    No_Codigo x;
-    x.info = info;
-
-    if (cab->pos_raiz == -1)
-    { //nao tem raiz ainda
-        printf("Inserir raiz\n");
-        x.direita = -1;
-        x.esquerda = -1;
-        escreve_no_codigo(arq, &x, 0);
-        cab->pos_raiz = 0;
-        cab->pos_topo++;
-
-        escreve_cabecalho_codigo(arq, cab);
-        return 1;
-    }
-    else
-    {
-        return adiciona_codigo_no_bd_codigos(arq, info, cab->pos_raiz);
-    }
-    return 0;
+    fclose(arq);
 }
 
 int maximo_codigo(FILE *arq, int pos)
@@ -265,8 +227,11 @@ int minimo_codigo(FILE *arq, int pos)
         return no_aux->info;
 }
 
-void imprimi_lista_codigo(FILE *arq)
+void imprimi_lista_codigo()
 {
+
+    FILE *arq = fopen("bdcodigos.bin", "rb+");
+
     No_Codigo x;
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     cab = le_cabecalho_codigos(arq);
@@ -281,6 +246,8 @@ void imprimi_lista_codigo(FILE *arq)
     }
 
     printf("\n");
+
+    fclose(arq);
 }
 
 void imprimir_arvore_binaria_na_notacao(FILE *arq, int pos)
@@ -320,70 +287,88 @@ void imprimir_arvore_binaria_na_notacao(FILE *arq, int pos)
     }
 }
 
+void imprime_tudo_notacao()
+{
+    FILE *arq = fopen("bdcodigos.bin", "rb+");
+    Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+    cab = le_cabecalho_codigos(arq);
+    imprimir_arvore_binaria_na_notacao(arq, cab->pos_raiz);
+    fclose(arq);
+}
+
 int excluir_codigo(FILE *arq, int pos, Codigo codigo)
 {
 
-    No_Codigo *no = (No_Codigo *)malloc(sizeof(No_Codigo));
-    no = le_no_codigo(arq, pos);
+    No_Codigo *aux = (No_Codigo *)malloc(sizeof(No_Codigo));
+    aux = le_no_codigo(arq, pos);
 
-    printf("CODIGO = %d - ", no->info);
-
-    if (codigo > no->info)
+    if (codigo > aux->info)
     { //navega para direita
-        printf("vai para direita \n");
-        no->direita = excluir_codigo(arq, no->direita, codigo);
-        escreve_no_codigo(arq, no, pos);
-        printf("CODIGO = %d agora tem dir como %d \n", no->info, no->direita);
+        aux->direita = excluir_codigo(arq, aux->direita, codigo);
+        escreve_no_codigo(arq, aux, pos);
     }
 
-    else if (codigo < no->info)
+    else if (codigo < aux->info)
     { //navega para esquerda
-        printf("vai para esquerda \n");
-        no->esquerda = excluir_codigo(arq, no->esquerda, codigo);
-        escreve_no_codigo(arq, no, pos);
-        printf("CODIGO = %d agora tem esq como %d \n", no->info, no->esquerda);
+        aux->esquerda = excluir_codigo(arq, aux->esquerda, codigo);
+        escreve_no_codigo(arq, aux, pos);
     }
-    else if (codigo == no->info)
+    else
     { // encontrou
-        printf("excluir \n");
 
-        if (no->esquerda == -1 && no->direita == -1)
-        { // no folha
+        if (aux->esquerda == -1 && aux->direita == -1)
+        { //no folha
             Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
             cab = le_cabecalho_codigos(arq);
 
-            no->esquerda = -1;
-            no->pos_livro = -1;
-            no->direita = -1;
+            //limpar livro;
+            aux->esquerda = -1;
+            aux->pos_livro = -1;
+            aux->direita = -1;
 
-            no->info = cab->pos_livre;
+            //Encadear lista de posicoes livres;
+            aux->info = cab->pos_livre;
             cab->pos_livre = pos;
-            escreve_cabecalho_codigo(arq, cab);
-            escreve_no_codigo(arq, no, pos);
 
+            //escrever informacoes no arquivo;
+            escreve_cabecalho_codigo(arq, cab);
+            escreve_no_codigo(arq, aux, pos);
+
+            //retornar uma posicao nula;
             return -1;
         }
-        if (no->esquerda == -1)
+        if (aux->esquerda == -1)
         { //somente filho a direita
-            printf("so tem filho pra direita \n");
-            no->info = minimo_codigo(arq, no->direita);
-            printf("teste %d \n", no->info);
-            no->direita = excluir_codigo(arq, no->direita, no->info);
-            escreve_no_codigo(arq, no, pos);
-            return pos;
+            aux->info = minimo_codigo(arq, aux->direita);
+            aux->direita = excluir_codigo(arq, aux->direita, aux->info);
+            escreve_no_codigo(arq, aux, pos);
         }
         else
         { // dois filhos ou 1 a esquerda
-            no->info = maximo_codigo(arq, no->esquerda);
-            printf("VAI EXCLUIR A BOLITA %d\n", no->info);
-            no->esquerda = excluir_codigo(arq, no->esquerda, no->info);
-            escreve_no_codigo(arq, no, pos);
-
-            return pos;
+            aux->info = maximo_codigo(arq, aux->esquerda);
+            aux->esquerda = excluir_codigo(arq, aux->esquerda, aux->info);
+            escreve_no_codigo(arq, aux, pos);
         }
     }
 
     return pos;
+}
+
+void iniciar_exclusao_Codigo(int info)
+{
+    FILE *arq = fopen("bdcodigos.bin", "rb+");
+
+    Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
+    cab = le_cabecalho_codigos(arq);
+
+    int raiz;
+    raiz = excluir_codigo(arq, cab->pos_raiz, info);
+
+    cab = le_cabecalho_codigos(arq);
+    cab->pos_raiz = raiz;
+
+    escreve_cabecalho_codigo(arq, cab);
+    free(cab);
 }
 
 void printa_no(FILE *arq, int pos)
@@ -433,16 +418,17 @@ void printa_arvore_por_nivel()
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     cab = le_cabecalho_codigos(arquivo_codigo);
 
-    if (cab->pos_raiz == -1) //nao tem nenhum codigo cadastrado
+    if (cab->pos_raiz != -1)
     {
-        printf("Nao existem livros cadastrados!\n");
-    }
-    else
-    {
+        int qtd = qtdLivros(arquivo_codigo, cab->pos_raiz);
         for (int i = 0; i < 999; i++)
         {
             printa_nivel(arquivo_codigo, cab->pos_raiz, 1, i);
         }
+    }
+    else
+    {
+        printf("Nao existem livros cadastrados\n");
     }
 
     fclose(arquivo_codigo);
@@ -451,7 +437,10 @@ void printa_arvore_por_nivel()
 int existe_codigo(FILE *arq, int codigo, int pos)
 {
     if (pos == -1)
+    {
         return 0;
+    }
+
     No_Codigo *no = (No_Codigo *)malloc(sizeof(No_Codigo));
     no = le_no_codigo(arq, pos);
 
@@ -496,6 +485,7 @@ int qtdLivros(FILE *arq, int pos)
         return qtdLivros(arq, aux->esquerda) + qtdLivros(arq, aux->direita) + 1;
     }
 }
+
 
 int mudar( FILE *arq, int pos,int  i, Dados_Livro v[]){
     No_Codigo * aux = (No_Codigo *) malloc(sizeof(No_Codigo));

@@ -68,12 +68,12 @@ int posicao_do_livro(FILE *arq, int pos, int codigo);
 //Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
 //pos deve ser uma posicao valida
 //Pos-condicao: codigo inserido dentro da arvore de codigos na posicao
-int adiciona_codigo_no_bd_codigos(FILE *arq, Codigo info, int pos);
+int adiciona_codigo_no_bd_codigos(FILE *arq, int pos, Codigo info);
 
 //Insere um novo codigo dentro da arvore de codigos
 //Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
 //Pos-condicao: codigo inserido dentro da arvore de codigos
-int insere_codigo(FILE *arq, Codigo info);
+void insere_codigo(int info);
 
 //Procura pelo maior codigo da arvore apartir daquele no
 //Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
@@ -95,11 +95,22 @@ void imprimi_lista_codigo(FILE *arq);
 //Pos-condicao: imprime a arvore inteira e forma binaria
 void imprimir_arvore_binaria_na_notacao(FILE *arq, int pos);
 
+//imprime a arvore inteira de forma binaria
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//Pos-condicao: imprime a arvore inteira e forma binaria
+void imprime_tudo_notacao();
+
 //Excluir um codigo dentro da arvore em uma pos exata
 //Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
 //pos deve ser uma posicao valida
 //Pos-condicao: codigo excluido da arvore de codigos
 int excluir_codigo(FILE *arq, int pos, Codigo codigo);
+
+//Excluir um codigo dentro da arvore em uma pos exata
+//Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
+//pos deve ser uma posicao valida
+//Pos-condicao: codigo excluido da arvore de codigos
+void iniciar_exclusao_Codigo(int info);
 
 //Printa o codigo de uma determinada posicao na arvore
 //Pre-condicao: arquivo deve estar aberto e ser um arquivo de lista
