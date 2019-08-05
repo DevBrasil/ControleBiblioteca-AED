@@ -59,35 +59,22 @@ void menu_start()
       break;
     case 4:
       ClearTerminal();
-      exclui_livro_entradas();
+      exclui_livro();
       break;
     case 5:
       ClearTerminal();
       buscar_dados_do_livro();
       break;
     case 6:
-      ClearTerminal();
-      FILE *arq = fopen("bdcodigos.bin", "rb+");
-      Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
-      cab = le_cabecalho_codigos(arq);
-
-      imprimir_arvore_binaria_na_notacao(arq, cab->pos_raiz);
-      printf("\n");
-
-      fclose(arq);
+      imprime_tudo_notacao();
       break;
     case 7:
       ClearTerminal();
-      printf("Opcao 7\n");
+      printa_arvore_por_nivel();
       break;
     case 8:
       ClearTerminal();
-      FILE *arq8 = fopen("bdcodigos.bin", "rb+");
-      Cabecalho_Codigo *cab2 = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
-      cab2 = le_cabecalho_codigos(arq8);
-
-      printf("%d\n", qtdLivros(arq8, cab2->pos_raiz, 0));
-      printf("Opcao 8\n");
+      livros_ordenados_por_codigo();
       break;
     case 9:
       ClearTerminal();

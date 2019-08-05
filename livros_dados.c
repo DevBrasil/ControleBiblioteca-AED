@@ -17,17 +17,14 @@ typedef struct Livro
 //Eabecalho do arquivo de dados
 typedef struct
 {
-    int pos_cabeca; //posi ̧c~ao do in ́ıcio da lista
-    int pos_topo;   // 1a posi ̧c~ao n~ao usada no fim do arquivo
-    int pos_livre;  // posi ̧c~ao do in ́ıcio da lista de n ́os livres
+    int pos_topo;  // 1a posi ̧c~ao n~ao usada no fim do arquivo
+    int pos_livre; // posi ̧c~ao do in ́ıcio da lista de n ́os livres
 } Cabecalho_livros_dados;
 
 //Estrutura de no de livro para lista encadeada
 typedef struct
 {
     Dados_Livro livro;
-    int ant;
-    int prox;
 } No_livro;
 
 void escreve_cabecalho_livro(FILE *arq, Cabecalho_livros_dados *cab)
@@ -39,7 +36,6 @@ void escreve_cabecalho_livro(FILE *arq, Cabecalho_livros_dados *cab)
 void cria_lista_vazia(FILE *arq)
 {
     Cabecalho_livros_dados *cab = (Cabecalho_livros_dados *)malloc(sizeof(Cabecalho_livros_dados));
-    cab->pos_cabeca = -1;
     cab->pos_topo = 0;
     cab->pos_livre = -1;
     escreve_cabecalho_livro(arq, cab);
@@ -74,44 +70,33 @@ int insere_livro(FILE *arq, Dados_Livro livro)
     Cabecalho_livros_dados *cab = le_cabecalho_livro(arq);
     No_livro x;
     x.livro = livro;
-    x.ant = cab->pos_cabeca;
-    x.prox = -1;
 
     if (cab->pos_livre == -1)
-    { // n~ao h ́a n ́os livres, ent~ao usar o topo
+    { // nao ha nos livres, entao usar o topo
         escreve_livro_no(arq, &x, cab->pos_topo);
 
-        No_livro *ant = le_no_livro(arq, x.ant);
-        ant->prox = cab->pos_topo;
-
-        escreve_livro_no(arq, ant, x.ant);
-
-        cab->pos_cabeca = cab->pos_topo;
         aux_pos = cab->pos_topo;
+
         cab->pos_topo++;
         escreve_cabecalho_livro(arq, cab);
         free(cab);
         return aux_pos;
     }
     else
-    { // usar n ́o da lista de livres
-        No_livro *livre = le_no_livro(arq, cab->pos_livre);
+    { // usar no da lista de livres
+        No_livro *livre = (No_livro *)malloc(sizeof(No_livro));
+        livre = le_no_livro(arq, cab->pos_livre);
 
         escreve_livro_no(arq, &x, cab->pos_livre);
-        cab->pos_cabeca = cab->pos_livre;
-
-        No_livro *ant = le_no_livro(arq, x.ant);
-        ant->prox = cab->pos_livre;
-
-        printf("no ant = %d \n", x.ant);
-
-        escreve_livro_no(arq, ant, x.ant);
 
         aux_pos = cab->pos_livre;
-        cab->pos_livre = livre->prox;
-        free(livre);
+        cab->pos_livre = livre->livro.codigo;
+
         escreve_cabecalho_livro(arq, cab);
+
+        free(livre);
         free(cab);
+
         return aux_pos;
     }
 }
@@ -126,6 +111,8 @@ void imprime_livro(int pos)
     x = le_no_livro(arquivo_livros, pos);
 
     printf("\nCodigo:  %d , Autor: %s , Titulo: %s , Exemplares: %d \n", x->livro.codigo, x->livro.autor, x->livro.titulo, x->livro.exemplares);
+
+    fclose(arquivo_livros);
 }
 
 void retira(FILE *arq, int pos)
@@ -138,44 +125,9 @@ void retira(FILE *arq, int pos)
     No_livro *aux = (No_livro *)malloc(sizeof(No_livro));
     aux = le_no_livro(arq, pos);
 
-    printf("caralho %d\n", pos);
-
-    if (pos == cab->pos_cabeca)
-    { // remo ̧c~ao na cabe ̧ca
-        No_livro *ant = (No_livro *)malloc(sizeof(No_livro));
-        ant = le_no_livro(arq, aux->ant);
-        ant->prox = -1;
-
-        escreve_livro_no(arq, ant, aux->ant);
-
-        cab->pos_cabeca = aux->ant;
-
-        escreve_cabecalho_livro(arq, cab);
-
-        free(ant);
-    }
-    else
-    { // remo ̧c~ao no meio
-        No_livro *ant = (No_livro *)malloc(sizeof(No_livro));
-        No_livro *prox = (No_livro *)malloc(sizeof(No_livro));
-
-        ant = le_no_livro(arq, aux->ant);
-        prox = le_no_livro(arq, aux->prox);
-
-        ant->prox = aux->prox;
-        prox->ant = aux->ant;
-
-        escreve_livro_no(arq, ant, aux->ant);
-        escreve_livro_no(arq, prox, aux->prox);
-
-        free(ant);
-        free(prox);
-    }
-
-    aux->prox = cab->pos_livre; // torna o n ́o removido um n ́o livre
-    aux->ant = -1;
-    aux->livro.codigo = -1;
+    aux->livro.codigo = cab->pos_livre;
     cab->pos_livre = pos;
+
     escreve_livro_no(arq, aux, pos);
     escreve_cabecalho_livro(arq, cab);
     free(aux);
