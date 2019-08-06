@@ -1,11 +1,20 @@
-CÃ³digo 	TÃ­tulo 	Autor 	Qtd. Exemplares
-30	 As Brumas de Avalon	  Marion Zimmer Bradley	----2
-6	 Mem Ìorias P Ìostumas de Br Ìas Cubas	 Joaquim Maria Machado de Assis	----7
-111	 Memorial de Maria Moura	  Rachel de Queiroz	----5
-45	 O Discurso do M Ìetodo	  Ren Ìe Descartes	----3
-70	 O Senhor dos An Ìeis	  J. R. R. Tolkien	----5
-90	 Primeiras Est Ìorias	  Jo~ao Guimar~aes Rosa	----4
-20	 Princ ÌÄ±pios e Pr Ìaticas de Programa Ì§c~ao com C++	  Bjarne Stroustrup	----3
-10	 Programming in Prolog	  W. Clocksin	----2
-150	 Sapiens: uma breve hist Ìoria da humanidade	 Yuval Harari	----11
-200	 Ulisses	  James Joyce	----7
+CÃ³digo: 30 Possui: 2 Unidade(s). Livro: As Brumas de Avalon escrito por:  Marion Zimmer Bradley
+CÃ³digo: 6 Possui: 7 Unidade(s). Livro: Mem Ìorias P Ìostumas de Br Ìas Cubas escrito por: Joaquim Maria Machado de Assis
+CÃ³digo: 111 Possui: 5 Unidade(s). Livro: Memorial de Maria Moura escrito por:  Rachel de Queiroz
+CÃ³digo: 45 Possui: 3 Unidade(s). Livro: O Discurso do M Ìetodo escrito por:  Ren Ìe Descartes
+CÃ³digo: 70 Possui: 5 Unidade(s). Livro: O Senhor dos An Ìeis escrito por:  J. R. R. Tolkien
+CÃ³digo: 90 Possui: 4 Unidade(s). Livro: Primeiras Est Ìorias escrito por:  Jo~ao Guimar~aes Rosa
+CÃ³digo: 20 Possui: 3 Unidade(s). Livro: Princ ÌÄ±pios e Pr Ìaticas de Programa Ì§c~ao com C++ escrito por:  Bjarne Stroustrup
+CÃ³digo: 10 Possui: 2 Unidade(s). Livro: Programming in Prolog escrito por:  W. Clocksin
+CÃ³digo: 150 Possui: 11 Unidade(s). Livro: Sapiens: uma breve hist Ìoria da humanidade escrito por: Yuval Harari
+CÃ³digo: 200 Possui: 7 Unidade(s). Livro: Ulisses escrito por:  James Joyce
+CÃ³digo: 20 Possui: 1 Unidade(s). Livro: ÿÿÿÿF escrito por: 
+CÃ³digo: 20 Possui: 1 Unidade(s). Livro: ÿÿÿÿF escrito por: 
+CÃ³digo: 20 Possui: 1 Unidade(s). Livro: ÿÿÿÿF escrito por: 
+CÃ³digo: 20 Possui: 1 Unidade(s). Livro: ÿÿÿÿF escrito por: 
+CÃ³digo: 20 Possui: 1 Unidade(s). Livro: ÿÿÿÿF escrito por: 
+CÃ³digo: 20 Possui: 1 Unidade(s). Livro: ÿÿÿÿF escrito por: 
+CÃ³digo: 20 Possui: 1 Unidade(s). Livro: ÿÿÿÿF escrito por: 
+CÃ³digo: 20 Possui: 1 Unidade(s). Livro: ÿÿÿÿF escrito por: 
+CÃ³digo: 20 Possui: 1 Unidade(s). Livro: ÿÿÿÿF escrito por: 
+CÃ³digo: 20 Possui: 1 Unidade(s). Livro: ÿÿÿÿF escrito por: 

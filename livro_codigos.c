@@ -590,27 +590,34 @@ void gerarListagemporTitulo()
     { //Tamanho do vetor definido pela função qtdLivros
         int n = qtdLivros(x, cab2->pos_raiz);
 
-
         //Alocando vetor dinâmicamente conforme o tanto de livros cadastrados no sistema
         Dados_Livro *v = (Dados_Livro *)malloc(n * sizeof(Dados_Livro));
 
         mudar(x, cab2->pos_raiz, -1, v);
 
-        
+        //Remover os comentários dessa sessão para imprimir no console os livros do sistema antes da ordenação
+        //
+        //
+        //   for (int p = 0; p < n; p++)
+        //   {
+        //       printf("[%d] = %s - Codigo: %d\n", p, v[p].titulo, v[p].codigo);
+        //   }
+        //-----------------------------------------------------------------------------------------------------
 
         //Efetuando Quicksort no vetor
         QuickSort(v, 0, n-1);
 
         FILE *h = fopen("Catalago de Livros.txt", "w");
 
-        fprintf(h, "Código \tTítulo \tAutor \tQtd. Exemplares\n");
+        //Escrevendo no arquivo os livros já ordenados
         for (int i = 0; i < n; i++)
         {
-            fprintf(h, "%d\t %s\t %s\t----%d\n", v[i].codigo, v[i].titulo, v[i].autor, v[i].exemplares);
+            fprintf(h, "Código: %d Possui: %d Unidade(s). Livro: %s escrito por: %s\n", v[i].codigo, v[i].exemplares, v[i].titulo, v[i].autor);
         }
 
         fclose(h);
 
+        //Imprimindo no console os livros já ordenados
         for (int asdf = 0; asdf < n; asdf++)
         {
             printf("[%d] = %s - Codigo: %d\n", asdf, v[asdf].titulo, v[asdf].codigo);
