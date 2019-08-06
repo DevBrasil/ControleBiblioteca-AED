@@ -1,9 +1,11 @@
 Código 	Título 	Autor 	Qtd. Exemplares
-4	 AAAA	  Bjarne Stroustrup	----3
-5	 BBBB	  W. Clocksin	----2
-3	 CCCC	 Yuval Harari	----11
-6	 DDDD	  Joao Guimaraes Rosa	----4
-2	 PPPP	  Marion Zimmer Bradley	----2
-7	 TTTT	  Rachel de Queiroz	----5
-8	 YYYY	 Joaquim Maria Machado de Assis	----7
-1	 ZZZZ	  J. R. R. Tolkien	----5
+30	 As Brumas de Avalon	  Marion Zimmer Bradley	----2
+6	 Mem ́orias P ́ostumas de Br ́as Cubas	 Joaquim Maria Machado de Assis	----7
+111	 Memorial de Maria Moura	  Rachel de Queiroz	----5
+45	 O Discurso do M ́etodo	  Ren ́e Descartes	----3
+70	 O Senhor dos An ́eis	  J. R. R. Tolkien	----5
+90	 Primeiras Est ́orias	  Jo~ao Guimar~aes Rosa	----4
+20	 Princ ́ıpios e Pr ́aticas de Programa ̧c~ao com C++	  Bjarne Stroustrup	----3
+10	 Programming in Prolog	  W. Clocksin	----2
+150	 Sapiens: uma breve hist ́oria da humanidade	 Yuval Harari	----11
+200	 Ulisses	  James Joyce	----7
