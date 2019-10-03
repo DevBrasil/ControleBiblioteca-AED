@@ -252,8 +252,6 @@ int minimo_codigo_pos_livro(FILE *arq, int pos)
         return no_aux->pos_livro;
 }
 
-
-
 void imprimi_lista_codigo()
 {
 
@@ -263,7 +261,7 @@ void imprimi_lista_codigo()
     Cabecalho_Codigo *cab = (Cabecalho_Codigo *)malloc(sizeof(Cabecalho_Codigo));
     cab = le_cabecalho_codigos(arq);
 
-   // printf("Raiz %d  Topo %d Livre %d\n", cab->pos_raiz, cab->pos_topo, cab->pos_livre);
+    // printf("Raiz %d  Topo %d Livre %d\n", cab->pos_raiz, cab->pos_topo, cab->pos_livre);
     int i = 0;
     while (fread(&x, sizeof(No_Codigo), 1, arq))
     {
@@ -382,14 +380,14 @@ int excluir_codigo(FILE *arq, int pos, Codigo codigo)
         if (aux->esquerda == -1)
         { //somente filho a direita
             aux->info = minimo_codigo(arq, aux->direita);
-            aux->pos_livro = minimo_codigo_pos_livro(arq,aux->direita);
+            aux->pos_livro = minimo_codigo_pos_livro(arq, aux->direita);
             aux->direita = excluir_codigo(arq, aux->direita, aux->info);
             escreve_no_codigo(arq, aux, pos);
         }
         else
         { // dois filhos ou 1 a esquerda
             aux->info = maximo_codigo(arq, aux->esquerda);
-            aux->pos_livro = maximo_codigo_pos_livro(arq,aux->esquerda);
+            aux->pos_livro = maximo_codigo_pos_livro(arq, aux->esquerda);
             aux->esquerda = excluir_codigo(arq, aux->esquerda, aux->info);
             escreve_no_codigo(arq, aux, pos);
         }
@@ -523,17 +521,17 @@ int mudar(FILE *arq, int pos, int i, Dados_Livro v[])
 
         i++;
         v[i] = a->livro;
-        if(aux->esquerda != -1){
+        if (aux->esquerda != -1)
+        {
             i = mudar(arq, aux->esquerda, i, v);
         }
-        
-        if(aux->direita != -1){
+
+        if (aux->direita != -1)
+        {
             i = mudar(arq, aux->direita, i, v);
         }
-
     }
 
-   
     return i;
 }
 
@@ -545,7 +543,6 @@ int particiona(Dados_Livro V[], int inicio, int final)
 
     Dados_Livro pivo = V[inicio];
     Dados_Livro aux;
-
 
     while (esq < dir)
     {
@@ -605,7 +602,7 @@ void gerarListagemporTitulo()
         //-----------------------------------------------------------------------------------------------------
 
         //Efetuando Quicksort no vetor
-        QuickSort(v, 0, n-1);
+        QuickSort(v, 0, n - 1);
 
         FILE *h = fopen("Catalago de Livros.txt", "w");
 
